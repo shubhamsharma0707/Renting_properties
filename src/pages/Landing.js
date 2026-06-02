@@ -43,8 +43,8 @@ export class Landing {
                   id="location-input"
                   class="input-field"
                   type="text"
-                  placeholder="e.g. Koramangala, Bangalore"
-                  value="Koramangala, Bangalore"
+                  placeholder="e.g. Koramangala, Bangalore or Sector 17, Chandigarh"
+                  value=""
                   autocomplete="off"
                 />
               </div>

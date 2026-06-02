@@ -5,6 +5,7 @@
  * - Indian city rental market averages
  * - Location-based price adjustments
  * - Budget range
+ * - Real geocoded center coordinates (from Nominatim/Google)
  */
 
 // ── City Price Profiles ───────────────────────────────────────────────────────
@@ -12,45 +13,93 @@ const CITY_PROFILES = {
   bangalore: {
     coords: { lat: 12.9716, lng: 77.5946 },
     base1bhk: 15000, base2bhk: 25000, base3bhk: 40000,
-    localities: ['Koramangala', 'Indiranagar', 'HSR Layout', 'Whitefield', 'Marathahalli', 'BTM Layout', 'Bellandur', 'Electronic City'],
-    keywords: ['koramangala', 'indiranagar', 'hsr', 'whitefield', 'marathahalli', 'btm', 'bellandur', 'electronic city', 'bengaluru', 'bangalore']
+    localities: ['Koramangala', 'Indiranagar', 'HSR Layout', 'Whitefield', 'Marathahalli', 'BTM Layout', 'Bellandur', 'Electronic City', 'Hebbal', 'Yelahanka', 'JP Nagar', 'Jayanagar'],
+    keywords: ['koramangala', 'indiranagar', 'hsr', 'whitefield', 'marathahalli', 'btm', 'bellandur', 'electronic city', 'bengaluru', 'bangalore', 'hebbal', 'yelahanka', 'jp nagar', 'jayanagar']
   },
   mumbai: {
     coords: { lat: 19.0760, lng: 72.8777 },
     base1bhk: 25000, base2bhk: 45000, base3bhk: 75000,
-    localities: ['Bandra', 'Andheri', 'Powai', 'Thane', 'Navi Mumbai', 'Malad', 'Goregaon', 'Borivali'],
-    keywords: ['bandra', 'andheri', 'powai', 'thane', 'navi mumbai', 'malad', 'mumbai', 'bombay']
+    localities: ['Bandra', 'Andheri', 'Powai', 'Thane', 'Navi Mumbai', 'Malad', 'Goregaon', 'Borivali', 'Dadar', 'Kurla', 'Vikhroli', 'Mulund'],
+    keywords: ['bandra', 'andheri', 'powai', 'thane', 'navi mumbai', 'malad', 'mumbai', 'bombay', 'dadar', 'kurla', 'vikhroli', 'mulund']
   },
   delhi: {
     coords: { lat: 28.6139, lng: 77.2090 },
     base1bhk: 12000, base2bhk: 20000, base3bhk: 35000,
-    localities: ['Lajpat Nagar', 'Saket', 'Dwarka', 'Rohini', 'Greater Kailash', 'Vasant Kunj'],
-    keywords: ['lajpat', 'saket', 'dwarka', 'rohini', 'delhi', 'new delhi']
+    localities: ['Lajpat Nagar', 'Saket', 'Dwarka', 'Rohini', 'Greater Kailash', 'Vasant Kunj', 'Janakpuri', 'Pitampura', 'Paharganj', 'Karol Bagh'],
+    keywords: ['lajpat', 'saket', 'dwarka', 'rohini', 'delhi', 'new delhi', 'vasant', 'janakpuri', 'pitampura', 'karol bagh']
   },
   gurgaon: {
     coords: { lat: 28.4595, lng: 77.0266 },
     base1bhk: 15000, base2bhk: 28000, base3bhk: 50000,
-    localities: ['DLF Phase 1', 'Sohna Road', 'Golf Course Road', 'Sector 56', 'Cyber City'],
-    keywords: ['gurgaon', 'gurugram', 'dlf', 'sohna', 'golf course']
+    localities: ['DLF Phase 1', 'Sohna Road', 'Golf Course Road', 'Sector 56', 'Cyber City', 'MG Road', 'Palam Vihar', 'Sector 49'],
+    keywords: ['gurgaon', 'gurugram', 'dlf', 'sohna', 'golf course', 'palam vihar']
+  },
+  noida: {
+    coords: { lat: 28.5355, lng: 77.3910 },
+    base1bhk: 10000, base2bhk: 18000, base3bhk: 30000,
+    localities: ['Sector 18', 'Sector 62', 'Sector 137', 'Greater Noida', 'Sector 50', 'Sector 44', 'Sector 76'],
+    keywords: ['noida', 'greater noida', 'sector 18', 'sector 62']
   },
   hyderabad: {
     coords: { lat: 17.3850, lng: 78.4867 },
     base1bhk: 12000, base2bhk: 20000, base3bhk: 32000,
-    localities: ['Madhapur', 'Gachibowli', 'Kondapur', 'Hitech City', 'Begumpet', 'Banjara Hills'],
-    keywords: ['madhapur', 'gachibowli', 'kondapur', 'hitech', 'hyderabad', 'hyd']
+    localities: ['Madhapur', 'Gachibowli', 'Kondapur', 'Hitech City', 'Begumpet', 'Banjara Hills', 'Jubilee Hills', 'Kukatpally', 'Miyapur'],
+    keywords: ['madhapur', 'gachibowli', 'kondapur', 'hitech', 'hyderabad', 'hyd', 'jubilee', 'kukatpally', 'miyapur']
   },
   pune: {
     coords: { lat: 18.5204, lng: 73.8567 },
     base1bhk: 12000, base2bhk: 20000, base3bhk: 32000,
-    localities: ['Kothrud', 'Baner', 'Hinjewadi', 'Viman Nagar', 'Wakad', 'Hadapsar'],
-    keywords: ['kothrud', 'baner', 'hinjewadi', 'viman', 'wakad', 'pune']
+    localities: ['Kothrud', 'Baner', 'Hinjewadi', 'Viman Nagar', 'Wakad', 'Hadapsar', 'Aundh', 'Kharadi', 'Magarpatta'],
+    keywords: ['kothrud', 'baner', 'hinjewadi', 'viman', 'wakad', 'pune', 'aundh', 'kharadi', 'magarpatta']
   },
   chennai: {
     coords: { lat: 13.0827, lng: 80.2707 },
     base1bhk: 10000, base2bhk: 18000, base3bhk: 28000,
-    localities: ['Adyar', 'Anna Nagar', 'T. Nagar', 'Velachery', 'OMR', 'Porur'],
-    keywords: ['adyar', 'anna nagar', 'tnagar', 't nagar', 'velachery', 'omr', 'chennai', 'madras']
-  }
+    localities: ['Adyar', 'Anna Nagar', 'T. Nagar', 'Velachery', 'OMR', 'Porur', 'Perambur', 'Sholinganallur', 'Tambaram'],
+    keywords: ['adyar', 'anna nagar', 'tnagar', 't nagar', 'velachery', 'omr', 'chennai', 'madras', 'porur', 'sholinganallur']
+  },
+  kolkata: {
+    coords: { lat: 22.5726, lng: 88.3639 },
+    base1bhk: 8000, base2bhk: 14000, base3bhk: 22000,
+    localities: ['Salt Lake', 'New Town', 'Park Street', 'Ballygunge', 'Howrah', 'Jadavpur', 'Lake Town', 'Behala'],
+    keywords: ['kolkata', 'calcutta', 'salt lake', 'new town', 'park street', 'ballygunge', 'jadavpur']
+  },
+  ahmedabad: {
+    coords: { lat: 23.0225, lng: 72.5714 },
+    base1bhk: 8000, base2bhk: 14000, base3bhk: 22000,
+    localities: ['SG Highway', 'Prahlad Nagar', 'Bopal', 'Navrangpura', 'Satellite', 'Vastrapur', 'Maninagar'],
+    keywords: ['ahmedabad', 'amdavad', 'sg highway', 'prahlad nagar', 'bopal', 'navrangpura']
+  },
+  jaipur: {
+    coords: { lat: 26.9124, lng: 75.7873 },
+    base1bhk: 7000, base2bhk: 12000, base3bhk: 20000,
+    localities: ['Malviya Nagar', 'Vaishali Nagar', 'Mansarovar', 'Jagatpura', 'Civil Lines', 'C-Scheme'],
+    keywords: ['jaipur', 'malviya nagar', 'vaishali nagar', 'mansarovar', 'jagatpura']
+  },
+  chandigarh: {
+    coords: { lat: 30.7333, lng: 76.7794 },
+    base1bhk: 9000, base2bhk: 15000, base3bhk: 25000,
+    localities: ['Sector 17', 'Sector 22', 'Sector 34', 'Mohali', 'Panchkula', 'Sector 44'],
+    keywords: ['chandigarh', 'mohali', 'panchkula', 'sector 17', 'sector 22', 'sector 34']
+  },
+  kochi: {
+    coords: { lat: 9.9312, lng: 76.2673 },
+    base1bhk: 8000, base2bhk: 14000, base3bhk: 22000,
+    localities: ['Marine Drive', 'Aluva', 'Edapally', 'Kakkanad', 'Palarivattom', 'Vyttila'],
+    keywords: ['kochi', 'cochin', 'ernakulam', 'aluva', 'edapally', 'kakkanad']
+  },
+  indore: {
+    coords: { lat: 22.7196, lng: 75.8577 },
+    base1bhk: 7000, base2bhk: 12000, base3bhk: 20000,
+    localities: ['Vijay Nagar', 'Palasia', 'AB Road', 'Bhawarkuan', 'Rau', 'Rajendra Nagar'],
+    keywords: ['indore', 'vijay nagar', 'palasia', 'bhawarkuan']
+  },
+  lucknow: {
+    coords: { lat: 26.8467, lng: 80.9462 },
+    base1bhk: 7000, base2bhk: 12000, base3bhk: 20000,
+    localities: ['Hazratganj', 'Gomti Nagar', 'Aliganj', 'Indira Nagar', 'Mahanagar', 'Alambagh'],
+    keywords: ['lucknow', 'hazratganj', 'gomti nagar', 'aliganj', 'indira nagar']
+  },
 };
 
 const PROPERTY_NAMES = [
@@ -67,11 +116,21 @@ const ALL_AMENITIES = ['Furnished', 'Parking', 'WiFi', 'AC', 'Gym', 'Security', 
 
 /**
  * Generate mock rental listings for a given location + budget
+ * @param {string} location - Human readable location string
+ * @param {number} budget - Max budget in INR
+ * @param {string} type - flat|house|pg|studio|all
+ * @param {string} bhk - 1|2|3|all
+ * @param {{ lat: number, lng: number }|null} centerOverride - Real geocoded coordinates (Nominatim/Google)
  */
-export function generateMockListings(location, budget, type = 'all', bhk = 'all') {
+export function generateMockListings(location, budget, type = 'all', bhk = 'all', centerOverride = null) {
   const profile = detectCityProfile(location);
-  const center = profile.coords;
-  const count = 16 + Math.floor(Math.random() * 8); // 16-24 listings
+
+  // Use real geocoded coordinates if provided, otherwise fall back to city profile coords
+  const center = (centerOverride && !isNaN(centerOverride.lat) && !isNaN(centerOverride.lng))
+    ? { lat: centerOverride.lat, lng: centerOverride.lng }
+    : profile.coords;
+
+  const count = 18 + Math.floor(Math.random() * 8); // 18-26 listings
 
   const properties = [];
   const usedNames = new Set();
@@ -88,10 +147,13 @@ export function generateMockListings(location, budget, type = 'all', bhk = 'all'
     const variance = 0.75 + Math.random() * 0.5; // ±25% variance
     const price = Math.round((basePrice * variance) / 500) * 500;
 
-    // Position: scatter around center within ~3km radius
-    const lat = center.lat + (Math.random() - 0.5) * 0.06;
-    const lng = center.lng + (Math.random() - 0.5) * 0.06;
-    const distance = (Math.random() * 3.5 + 0.3).toFixed(1);
+    // Position: scatter around the REAL center within ~2.5km radius
+    // ~0.045 degrees ≈ 5km at Indian latitudes, so 0.022 per axis ≈ 2.5km radius
+    const latOff = (Math.random() - 0.5) * 0.045;
+    const lngOff = (Math.random() - 0.5) * 0.045;
+    const lat = center.lat + latOff;
+    const lng = center.lng + lngOff;
+    const distance = (Math.sqrt(latOff ** 2 + lngOff ** 2) * 111).toFixed(1);
 
     // Area
     const area = generateArea(bhkNum);

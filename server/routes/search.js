@@ -3,6 +3,7 @@ import { getPlacesData } from '../services/places.js';
 import { getWebSearchRentals } from '../services/websearch.js';
 import { generateMockListings, getMockInsights } from '../scrapers/rentData.js';
 import { getAIAdvice } from '../services/gemini.js';
+import { geocodeLocation } from '../services/geocoder.js';
 
 const router = express.Router();
 
@@ -35,13 +36,24 @@ router.get('/search', async (req, res) => {
     const hasGoogleKey = !!process.env.GOOGLE_MAPS_API_KEY;
     const hasSerpKey = !!process.env.SERPAPI_KEY;
 
+    // ── Step 0: Geocode the location via Nominatim (free, no key needed) ─────
+    let geocodedCenter = null;
+    try {
+      const geo = await geocodeLocation(location);
+      geocodedCenter = { lat: geo.lat, lng: geo.lng };
+      center = geocodedCenter;
+      console.log(`   📍 Geocoded: ${geo.displayName} → ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)}`);
+    } catch (err) {
+      console.warn(`   ⚠️  Geocoding failed: ${err.message}`);
+    }
+
     // ── Real Data: Google Places ──────────────────────────────────────────────
     if (hasGoogleKey) {
       try {
         const placesResult = await getPlacesData(location, budgetNum, type);
         if (placesResult.properties.length > 0) {
           properties = placesResult.properties;
-          center = placesResult.center;
+          center = placesResult.center || geocodedCenter;
           dataSource = 'google';
           console.log(`   ✅ Google Places: ${properties.length} results`);
         }
@@ -55,9 +67,19 @@ router.get('/search', async (req, res) => {
       try {
         const serpResults = await getWebSearchRentals(location, budgetNum, bhk);
         if (serpResults.length > 0) {
-          // Merge or add unique serp results
-          const serpIds = new Set(properties.map(p => p.id));
-          const newResults = serpResults.filter(p => !serpIds.has(p.id));
+          // Approximate lat/lng for serp results that don't have coords
+          const serpWithCoords = serpResults.map((p, i) => {
+            if (!p.lat && geocodedCenter) {
+              // Scatter around geocoded center
+              const latOff = (Math.random() - 0.5) * 0.04;
+              const lngOff = (Math.random() - 0.5) * 0.04;
+              return { ...p, lat: geocodedCenter.lat + latOff, lng: geocodedCenter.lng + lngOff };
+            }
+            return p;
+          });
+
+          const existingIds = new Set(properties.map(p => p.id));
+          const newResults = serpWithCoords.filter(p => !existingIds.has(p.id));
           properties = [...properties, ...newResults];
           dataSource = hasGoogleKey ? 'google+serp' : 'serp';
           console.log(`   ✅ SerpAPI: ${serpResults.length} results`);
@@ -67,13 +89,13 @@ router.get('/search', async (req, res) => {
       }
     }
 
-    // ── Fallback: Smart Mock Data ─────────────────────────────────────────────
+    // ── Fallback: Smart Mock Data with REAL coordinates ───────────────────────
     if (properties.length === 0) {
-      const mockResult = generateMockListings(location, budgetNum, type, bhk);
+      const mockResult = generateMockListings(location, budgetNum, type, bhk, geocodedCenter);
       properties = mockResult.properties;
       center = center || mockResult.center;
       dataSource = 'mock';
-      console.log(`   ℹ️  Using generated mock data: ${properties.length} results`);
+      console.log(`   ℹ️  Using generated mock data (centered at real location): ${properties.length} results`);
     }
 
     // ── Filter & Sort ─────────────────────────────────────────────────────────
@@ -124,50 +146,21 @@ router.get('/search', async (req, res) => {
 
 /**
  * GET /api/geocode?address=...
- * Returns lat/lng for a given address (uses mock fallback if no Google key)
+ * Returns lat/lng for a given address using Nominatim (free, no key needed)
  */
 router.get('/geocode', async (req, res) => {
   const { address } = req.query;
   if (!address) return res.status(400).json({ error: 'Address required' });
 
-  if (process.env.GOOGLE_MAPS_API_KEY) {
-    try {
-      const { default: axios } = await import('axios');
-      const url = `https://maps.googleapis.com/maps/api/geocode/json`;
-      const resp = await axios.get(url, {
-        params: { address, key: process.env.GOOGLE_MAPS_API_KEY }
-      });
-      if (resp.data.results?.[0]) {
-        const loc = resp.data.results[0].geometry.location;
-        return res.json({ lat: loc.lat, lng: loc.lng, formatted: resp.data.results[0].formatted_address });
-      }
-    } catch (err) {
-      console.warn('Geocode error:', err.message);
-    }
+  try {
+    const result = await geocodeLocation(address);
+    res.json({ lat: result.lat, lng: result.lng, formatted: result.displayName });
+  } catch (err) {
+    console.warn('Geocode error:', err.message);
+    res.status(500).json({ error: 'Geocoding failed' });
   }
-
-  // Mock geocode for popular Indian cities
-  const cityCoords = {
-    bangalore: { lat: 12.9716, lng: 77.5946 },
-    mumbai: { lat: 19.0760, lng: 72.8777 },
-    delhi: { lat: 28.6139, lng: 77.2090 },
-    hyderabad: { lat: 17.3850, lng: 78.4867 },
-    pune: { lat: 18.5204, lng: 73.8567 },
-    chennai: { lat: 13.0827, lng: 80.2707 },
-    kolkata: { lat: 22.5726, lng: 88.3639 },
-    ahmedabad: { lat: 23.0225, lng: 72.5714 },
-    koramangala: { lat: 12.9279, lng: 77.6271 },
-    'indiranagar': { lat: 12.9784, lng: 77.6408 },
-    'bandra': { lat: 19.0596, lng: 72.8295 },
-    'andheri': { lat: 19.1136, lng: 72.8697 },
-    'gurgaon': { lat: 28.4595, lng: 77.0266 },
-    'noida': { lat: 28.5355, lng: 77.3910 },
-  };
-
-  const key = address.toLowerCase().split(',')[0].trim();
-  const coords = cityCoords[key] || { lat: 12.9716, lng: 77.5946 };
-  res.json({ ...coords, formatted: address });
 });
+
 
 /**
  * GET /api/ai-advice?location=...&budget=...
