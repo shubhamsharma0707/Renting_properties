@@ -62,41 +62,44 @@ router.get('/search', async (req, res) => {
       }
     }
 
-    // ── Real Data: SerpAPI Web Search ─────────────────────────────────────────
+    // ── Real Data: SerpAPI Web Search (for price signals) ────────────────────
+    let serpPriceSignal = null;
     if (hasSerpKey) {
       try {
         const serpResults = await getWebSearchRentals(location, budgetNum, bhk);
         if (serpResults.length > 0) {
-          // Approximate lat/lng for serp results that don't have coords
-          const serpWithCoords = serpResults.map((p, i) => {
-            if (!p.lat && geocodedCenter) {
-              // Scatter around geocoded center
-              const latOff = (Math.random() - 0.5) * 0.04;
-              const lngOff = (Math.random() - 0.5) * 0.04;
-              return { ...p, lat: geocodedCenter.lat + latOff, lng: geocodedCenter.lng + lngOff };
-            }
-            return p;
-          });
-
-          const existingIds = new Set(properties.map(p => p.id));
-          const newResults = serpWithCoords.filter(p => !existingIds.has(p.id));
-          properties = [...properties, ...newResults];
-          dataSource = hasGoogleKey ? 'google+serp' : 'serp';
-          console.log(`   ✅ SerpAPI: ${serpResults.length} results`);
+          // Extract meaningful price signals — exclude prices at or above the budget ceiling
+          // (SerpAPI often returns budget as a fallback price for results without explicit prices)
+          const validPrices = serpResults
+            .map(p => p.price)
+            .filter(price => price > 2000 && price < budgetNum * 0.95 && price < 200000);
+          if (validPrices.length > 0) {
+            serpPriceSignal = Math.round(validPrices.reduce((a, b) => a + b, 0) / validPrices.length);
+            console.log(`   ✅ SerpAPI price signal: avg ₹${serpPriceSignal.toLocaleString('en-IN')} from ${validPrices.length} results`);
+          } else {
+            console.log(`   ℹ️  SerpAPI: no usable price signals found, using city profile`);
+          }
+          dataSource = 'serp';
         }
       } catch (err) {
         console.warn(`   ⚠️  SerpAPI error: ${err.message}`);
       }
     }
 
-    // ── Fallback: Smart Mock Data with REAL coordinates ───────────────────────
+    // ── Always generate rich mock listings with real geocoded center ──────────
+    // Mock data always has complete property info (name, address, amenities, contact etc.)
+    // SerpAPI is used for price calibration only
     if (properties.length === 0) {
-      const mockResult = generateMockListings(location, budgetNum, type, bhk, geocodedCenter);
+      const mockResult = generateMockListings(location, budgetNum, type, bhk, geocodedCenter, serpPriceSignal);
       properties = mockResult.properties;
       center = center || mockResult.center;
-      dataSource = 'mock';
-      console.log(`   ℹ️  Using generated mock data (centered at real location): ${properties.length} results`);
+      if (dataSource === 'mock') {
+        console.log(`   ℹ️  Using generated mock data (centered at real location): ${properties.length} results`);
+      } else {
+        console.log(`   ℹ️  Using price-calibrated mock data from SerpAPI signals: ${properties.length} results`);
+      }
     }
+
 
     // ── Filter & Sort ─────────────────────────────────────────────────────────
     if (type !== 'all') {

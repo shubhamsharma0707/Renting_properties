@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const SERPAPI_BASE = 'https://serpapi.com/search';
-const KEY = process.env.SERPAPI_KEY;
+// Read key at call time (not at import time) so dotenv has a chance to load it
+const getKey = () => process.env.SERPAPI_KEY;
 
 /**
  * Use SerpAPI to search the web for actual rental listings with prices
@@ -10,6 +11,7 @@ const KEY = process.env.SERPAPI_KEY;
  * @param {string} bhk - 1|2|3|all
  */
 export async function getWebSearchRentals(location, budget, bhk) {
+  const KEY = getKey();
   if (!KEY) throw new Error('No SerpAPI key configured');
 
   const bhkStr = bhk !== 'all' ? `${bhk}BHK ` : '';

@@ -2,12 +2,14 @@ import axios from 'axios';
 
 const PLACES_BASE = 'https://maps.googleapis.com/maps/api/place';
 const GEOCODE_BASE = 'https://maps.googleapis.com/maps/api/geocode/json';
-const KEY = process.env.GOOGLE_MAPS_API_KEY;
+// Read key at call time (not at import time) so dotenv has a chance to load it
+const getKey = () => process.env.GOOGLE_MAPS_API_KEY;
 
 /**
  * Geocode an address string → { lat, lng }
  */
 async function geocodeAddress(address) {
+  const KEY = getKey();
   const resp = await axios.get(GEOCODE_BASE, {
     params: { address, key: KEY }
   });
@@ -25,6 +27,7 @@ async function geocodeAddress(address) {
  * @param {string} type - flat|house|pg|studio|all
  */
 export async function getPlacesData(location, budget, type) {
+  const KEY = getKey();
   if (!KEY) throw new Error('No Google Maps API key configured');
 
   // Step 1: Geocode the location

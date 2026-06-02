@@ -100,6 +100,55 @@ const CITY_PROFILES = {
     localities: ['Hazratganj', 'Gomti Nagar', 'Aliganj', 'Indira Nagar', 'Mahanagar', 'Alambagh'],
     keywords: ['lucknow', 'hazratganj', 'gomti nagar', 'aliganj', 'indira nagar']
   },
+  rohtak: {
+    coords: { lat: 28.9010, lng: 76.5802 },
+    base1bhk: 6000, base2bhk: 10000, base3bhk: 16000,
+    localities: ['Sector 1', 'Sector 2', 'Sector 3', 'Model Town', 'Civil Lines', 'Surya Nagar', 'Shastri Nagar'],
+    keywords: ['rohtak', 'haryana']
+  },
+  patna: {
+    coords: { lat: 25.5941, lng: 85.1376 },
+    base1bhk: 6000, base2bhk: 10000, base3bhk: 16000,
+    localities: ['Boring Road', 'Bailey Road', 'Kankarbagh', 'Raja Bazar', 'Patliputra Colony'],
+    keywords: ['patna', 'bihar', 'boring road', 'bailey road', 'kankarbagh']
+  },
+  bhopal: {
+    coords: { lat: 23.2599, lng: 77.4126 },
+    base1bhk: 7000, base2bhk: 12000, base3bhk: 20000,
+    localities: ['Arera Colony', 'MP Nagar', 'Kolar Road', 'Hoshangabad Road', 'Shahpura'],
+    keywords: ['bhopal', 'arera', 'mp nagar', 'kolar']
+  },
+  nagpur: {
+    coords: { lat: 21.1458, lng: 79.0882 },
+    base1bhk: 7000, base2bhk: 12000, base3bhk: 20000,
+    localities: ['Dharampeth', 'Ramdaspeth', 'Sitabuldi', 'Manish Nagar', 'Wardha Road'],
+    keywords: ['nagpur', 'dharampeth', 'ramdaspeth', 'wardha']
+  },
+  surat: {
+    coords: { lat: 21.1702, lng: 72.8311 },
+    base1bhk: 8000, base2bhk: 14000, base3bhk: 22000,
+    localities: ['Vesu', 'Adajan', 'Katargam', 'Udhna', 'Piplod', 'Ghod Dod Road'],
+    keywords: ['surat', 'vesu', 'adajan', 'katargam', 'udhna']
+  },
+  vizag: {
+    coords: { lat: 17.6868, lng: 83.2185 },
+    base1bhk: 8000, base2bhk: 13000, base3bhk: 22000,
+    localities: ['MVP Colony', 'Gajuwaka', 'Dwaraka Nagar', 'Madhurawada', 'Rushikonda'],
+    keywords: ['vizag', 'visakhapatnam', 'mvp colony', 'madhurawada', 'gajuwaka']
+  },
+  mysore: {
+    coords: { lat: 12.2958, lng: 76.6394 },
+    base1bhk: 8000, base2bhk: 13000, base3bhk: 22000,
+    localities: ['Vijayanagar', 'Hebbal', 'Kuvempunagar', 'Jayalakshmipuram', 'Gokulam'],
+    keywords: ['mysore', 'mysuru', 'vijayanagar', 'gokulam', 'hebbal']
+  },
+  // Generic fallback for any unknown Indian city
+  _generic: {
+    coords: { lat: 20.5937, lng: 78.9629 }, // Geographic center of India
+    base1bhk: 8000, base2bhk: 13000, base3bhk: 22000,
+    localities: ['Main Market', 'Civil Lines', 'Model Town', 'New Colony', 'Sector 1', 'Sector 2', 'Old City'],
+    keywords: []
+  },
 };
 
 const PROPERTY_NAMES = [
@@ -121,8 +170,9 @@ const ALL_AMENITIES = ['Furnished', 'Parking', 'WiFi', 'AC', 'Gym', 'Security', 
  * @param {string} type - flat|house|pg|studio|all
  * @param {string} bhk - 1|2|3|all
  * @param {{ lat: number, lng: number }|null} centerOverride - Real geocoded coordinates (Nominatim/Google)
+ * @param {number|null} serpPriceSignal - Real-world average price from SerpAPI (optional calibration)
  */
-export function generateMockListings(location, budget, type = 'all', bhk = 'all', centerOverride = null) {
+export function generateMockListings(location, budget, type = 'all', bhk = 'all', centerOverride = null, serpPriceSignal = null) {
   const profile = detectCityProfile(location);
 
   // Use real geocoded coordinates if provided, otherwise fall back to city profile coords
@@ -142,10 +192,18 @@ export function generateMockListings(location, budget, type = 'all', bhk = 'all'
     const name = pickUnique(PROPERTY_NAMES, usedNames);
     const locality = profile.localities[Math.floor(Math.random() * profile.localities.length)];
 
-    // Price: based on city profile + BHK + variance
-    const basePrice = getBHKBase(profile, bhkNum, propType);
+    // Price: use SerpAPI signal if available and reasonable, else city profile
+    let basePrice;
+    if (serpPriceSignal && serpPriceSignal > 3000 && serpPriceSignal < 200000) {
+      // Calibrate around the real-world signal price
+      const bhkMultipliers = { 1: 0.65, 2: 1.0, 3: 1.45 };
+      basePrice = serpPriceSignal * (bhkMultipliers[bhkNum] || 1.0);
+    } else {
+      basePrice = getBHKBase(profile, bhkNum, propType);
+    }
     const variance = 0.75 + Math.random() * 0.5; // ±25% variance
     const price = Math.round((basePrice * variance) / 500) * 500;
+
 
     // Position: scatter around the REAL center within ~2.5km radius
     // ~0.045 degrees ≈ 5km at Indian latitudes, so 0.022 per axis ≈ 2.5km radius
@@ -165,7 +223,8 @@ export function generateMockListings(location, budget, type = 'all', bhk = 'all'
     properties.push({
       id: `mock_${i}_${Date.now()}`,
       name: `${name}`,
-      address: `${locality}, ${profile.city || location.split(',')[0]}`,
+      // Use real searched location name, not the profile city (avoids "Bangalore" showing for Rohtak)
+      address: `${locality}, ${location.split(',')[0].trim()}`,
       lat,
       lng,
       price,
@@ -239,12 +298,15 @@ export function getMockInsights(properties, budget, location) {
 function detectCityProfile(location) {
   const lower = location.toLowerCase();
   for (const [city, profile] of Object.entries(CITY_PROFILES)) {
+    if (city === '_generic') continue; // skip generic in keyword matching
     if (profile.keywords.some(k => lower.includes(k))) {
       return { ...profile, city };
     }
   }
-  // Default: Bangalore
-  return { ...CITY_PROFILES.bangalore, city: 'Bangalore' };
+  // Unknown city — use generic Indian city profile (moderate prices)
+  // The centerOverride from Nominatim will provide the correct location
+  const cityName = location.split(',')[0].trim();
+  return { ...CITY_PROFILES._generic, city: cityName };
 }
 
 function getBHKBase(profile, bhk, type) {
