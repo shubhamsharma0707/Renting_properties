@@ -13,18 +13,22 @@ export class PriceInsights {
   build() {
     const i   = this.insights;
     const pct = Math.min(100, i.budgetPercentile || 50);
-    const trendIcon  = i.marketTrend === 'rising' ? '📈' : '📊';
+
+    const trendSVG = i.marketTrend === 'rising'
+      ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`
+      : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`;
     const trendColor = i.marketTrend === 'rising' ? 'var(--amber)' : 'var(--green)';
 
     const el = document.createElement('div');
     el.className = 'insights-panel';
     el.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:700;color:var(--text-primary);">
-          📊 Market Insights — ${this.location?.split(',')[0] || 'This Area'}
+        <div style="font-family:var(--font-body);font-size:0.85rem;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Market Insights — ${this.location?.split(',')[0] || 'This Area'}
         </div>
-        <div style="font-size:0.72rem;color:${trendColor};background:rgba(245,158,11,0.1);padding:3px 8px;border-radius:4px;font-weight:600;">
-          ${trendIcon} ${i.marketTrend === 'rising' ? `+${i.trendPercent}% MoM` : 'Stable'}
+        <div style="font-size:0.72rem;color:${trendColor};background:rgba(212,160,74,0.1);padding:3px 10px;border-radius:4px;font-weight:600;display:flex;align-items:center;gap:4px;">
+          ${trendSVG} ${i.marketTrend === 'rising' ? `+${i.trendPercent}% MoM` : 'Stable'}
         </div>
       </div>
 
@@ -61,20 +65,21 @@ export class PriceInsights {
         </div>
       </div>
 
-      <div style="font-size:0.78rem;color:var(--text-secondary);padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:2px solid var(--accent);margin-bottom:8px;">
-        💡 ${i.recommendation}
+      <div style="font-size:0.78rem;color:var(--text-secondary);padding:8px 12px;background:rgba(109,191,130,0.04);border-radius:6px;border-left:2px solid var(--accent);margin-bottom:8px;display:flex;align-items:flex-start;gap:6px;">
+        <svg style="flex-shrink:0;margin-top:1px;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>${i.recommendation}</span>
       </div>
 
-      <!-- Gemini AI Advice block -->
+      <!-- AI Advice block -->
       <div id="ai-advice-block" style="
         display:flex;align-items:flex-start;gap:10px;
         padding:10px 12px;
-        background:rgba(139,92,246,0.07);
-        border:1px solid rgba(139,92,246,0.2);
+        background:rgba(109,191,130,0.06);
+        border:1px solid rgba(109,191,130,0.2);
         border-radius:8px;
         min-height:44px;
       ">
-        <span style="font-size:1.1rem;flex-shrink:0;margin-top:1px;">🤖</span>
+        <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M12 8v4l3 3"/></svg>
         <div id="ai-advice-text" style="font-size:0.78rem;color:var(--text-secondary);line-height:1.55;">
           <span style="color:var(--text-muted);font-style:italic;animation:pulse 1.5s ease infinite;">
             Gemini is analysing the market...
@@ -103,8 +108,9 @@ export class PriceInsights {
       adviceEl.innerHTML = `
         <div style="color:var(--text-primary);margin-bottom:${data.tip ? '6px' : '0'};">${data.advice}</div>
         ${data.tip ? `
-          <div style="font-size:0.72rem;color:var(--violet);display:flex;align-items:flex-start;gap:4px;margin-top:4px;">
-            <span>✨</span><span>${data.tip}</span>
+          <div style="font-size:0.72rem;color:var(--earth);display:flex;align-items:flex-start;gap:4px;margin-top:4px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--earth)" stroke="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <span>${data.tip}</span>
           </div>
         ` : ''}
       `;

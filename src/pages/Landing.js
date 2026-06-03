@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { formatINR } from '../utils/api.js';
 
+// SVG icons (no emojis)
+const ICON_LOCATION = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
+const ICON_HOME     = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>`;
+const ICON_BUDGET   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+const ICON_BED      = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>`;
+const ICON_SEARCH   = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
+
 export class Landing {
   constructor(container, navigate) {
     this.container = container;
@@ -38,7 +45,9 @@ export class Landing {
           <div class="glass search-form">
             <div class="form-row">
               <div class="input-group">
-                <label class="input-label" for="location-input">📍 Location / Locality</label>
+                <label class="input-label" for="location-input">
+                  <span style="display:inline-flex;align-items:center;gap:5px;">${ICON_LOCATION} Location / Locality</span>
+                </label>
                 <input
                   id="location-input"
                   class="input-field"
@@ -50,7 +59,9 @@ export class Landing {
               </div>
 
               <div class="input-group">
-                <label class="input-label">🏠 Property Type</label>
+                <label class="input-label">
+                  <span style="display:inline-flex;align-items:center;gap:5px;">${ICON_HOME} Property Type</span>
+                </label>
                 <div class="chip-group" id="type-chips">
                   <button class="chip active" data-value="all">All</button>
                   <button class="chip" data-value="flat">Flat</button>
@@ -63,7 +74,9 @@ export class Landing {
 
             <div class="form-row">
               <div class="input-group">
-                <label class="input-label">💰 Monthly Budget</label>
+                <label class="input-label">
+                  <span style="display:inline-flex;align-items:center;gap:5px;">${ICON_BUDGET} Monthly Budget</span>
+                </label>
                 <div class="budget-display" id="budget-display">${formatINR(this.budget)} / mo</div>
                 <div class="budget-slider-row">
                   <span class="budget-label">₹5K</span>
@@ -81,7 +94,9 @@ export class Landing {
               </div>
 
               <div class="input-group">
-                <label class="input-label">🛏️ BHK Configuration</label>
+                <label class="input-label">
+                  <span style="display:inline-flex;align-items:center;gap:5px;">${ICON_BED} BHK Configuration</span>
+                </label>
                 <div class="chip-group" id="bhk-chips">
                   <button class="chip active" data-value="all">Any</button>
                   <button class="chip" data-value="1">1 BHK</button>
@@ -94,28 +109,28 @@ export class Landing {
             <div class="form-divider"></div>
 
             <div class="form-submit-row">
-              <button class="btn btn-primary" id="search-btn" style="font-size:1rem;padding:14px 36px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
+              <button class="btn btn-primary" id="search-btn" style="font-size:1rem;padding:14px 40px;">
+                ${ICON_SEARCH}
                 Search Properties
               </button>
               <span style="color:var(--text-muted);font-size:0.78rem;">Real-time data · Updated now</span>
             </div>
           </div>
 
-          <div style="display:flex;gap:32px;margin-top:28px;animation:fadeSlideUp 0.8s 0.5s ease both;">
+          <div style="display:flex;gap:40px;margin-top:32px;animation:fadeSlideUp 0.8s 0.5s ease both;">
             <div style="text-align:center;">
-              <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--accent);">50K+</div>
-              <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Listings</div>
+              <div style="font-family:var(--font-body);font-size:1.6rem;font-weight:800;color:var(--accent);">50K+</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Listings</div>
             </div>
+            <div style="width:1px;background:var(--border);"></div>
             <div style="text-align:center;">
-              <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--violet);">30+</div>
-              <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Cities</div>
+              <div style="font-family:var(--font-body);font-size:1.6rem;font-weight:800;color:var(--earth);">30+</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Cities</div>
             </div>
+            <div style="width:1px;background:var(--border);"></div>
             <div style="text-align:center;">
-              <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--green);">Live</div>
-              <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">Pricing</div>
+              <div style="font-family:var(--font-body);font-size:1.6rem;font-weight:800;color:var(--green);">Live</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Pricing</div>
             </div>
           </div>
         </div>
@@ -188,7 +203,7 @@ export class Landing {
     slider.style.background = `linear-gradient(90deg, var(--accent) ${pct}%, var(--border) ${pct}%)`;
   }
 
-  // ── Three.js City Scene ───────────────────────────────────────────────────
+  // ── Three.js Forest Scene ─────────────────────────────────────────────────
 
   initThreeJS() {
     const canvas = document.getElementById('hero-canvas');
@@ -198,13 +213,13 @@ export class Landing {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    this.renderer.setClearColor(0x07090f, 1);
+    this.renderer.setClearColor(0x0d1f17, 1);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.2;
+    this.renderer.toneMappingExposure = 1.1;
 
     // Scene
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x07090f, 0.025);
+    this.scene.fog = new THREE.FogExp2(0x0d1f17, 0.02);
 
     // Camera
     this.camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
@@ -212,11 +227,11 @@ export class Landing {
     this.camera.lookAt(0, 4, 0);
 
     // Build scene
-    this.addStars();
+    this.addParticles();
     this.addCity();
     this.addLights();
     this.addGround();
-    this.addFloatingParticles();
+    this.addFloatingDust();
 
     // Start animation loop
     this.animate();
@@ -226,8 +241,8 @@ export class Landing {
     window.addEventListener('resize', this.resizeHandler);
   }
 
-  addStars() {
-    const count = 2000;
+  addParticles() {
+    const count = 1500;
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       positions[i * 3]     = (Math.random() - 0.5) * 300;
@@ -237,11 +252,11 @@ export class Landing {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const mat = new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.18,
+      color: 0x6dbf82,
+      size: 0.12,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.35,
     });
     this.stars = new THREE.Points(geo, mat);
     this.scene.add(this.stars);
@@ -279,14 +294,14 @@ export class Landing {
     ];
 
     for (const cfg of buildingConfigs) {
-      // Main building body
+      // Main building body — earthy forest tones
       const geo = new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d);
       const mat = new THREE.MeshStandardMaterial({
-        color: cfg.accent ? 0x0d2233 : 0x0a1520,
-        emissive: cfg.accent ? 0x001122 : 0x000811,
+        color: cfg.accent ? 0x1a3d28 : 0x142a1e,
+        emissive: cfg.accent ? 0x0a2018 : 0x050e08,
         emissiveIntensity: 0.3,
-        roughness: 0.8,
-        metalness: 0.2,
+        roughness: 0.85,
+        metalness: 0.1,
       });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(cfg.x, cfg.h / 2, cfg.z);
@@ -294,25 +309,25 @@ export class Landing {
       mesh.receiveShadow = true;
       this.buildings.add(mesh);
 
-      // Glowing top accent
+      // Glowing top accent in forest green
       if (cfg.accent) {
         const topGeo = new THREE.BoxGeometry(cfg.w * 0.6, 0.15, cfg.d * 0.6);
         const topMat = new THREE.MeshStandardMaterial({
-          color: 0x00d4ff,
-          emissive: 0x00d4ff,
-          emissiveIntensity: 2.5,
+          color: 0x6dbf82,
+          emissive: 0x6dbf82,
+          emissiveIntensity: 2.0,
         });
         const top = new THREE.Mesh(topGeo, topMat);
         top.position.set(cfg.x, cfg.h + 0.08, cfg.z);
         this.buildings.add(top);
 
-        // Point light at top
-        const light = new THREE.PointLight(0x00d4ff, 0.8, 6);
+        // Point light — green
+        const light = new THREE.PointLight(0x6dbf82, 0.6, 6);
         light.position.set(cfg.x, cfg.h + 0.5, cfg.z);
         this.buildings.add(light);
       }
 
-      // Window grid
+      // Window grid — warm amber/green tones
       this.addWindows(cfg);
     }
 
@@ -326,21 +341,21 @@ export class Landing {
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        if (Math.random() > 0.65) continue; // Some windows lit up
+        if (Math.random() > 0.65) continue;
 
         const on = Math.random() > 0.25;
-        const color = Math.random() > 0.5 ? 0xffd080 : 0x88ddff;
+        // warm amber and soft green window lights
+        const color = Math.random() > 0.5 ? 0xc9975a : 0x6dbf82;
 
         const geo = new THREE.PlaneGeometry(winW, winH);
         const mat = new THREE.MeshStandardMaterial({
-          color: on ? color : 0x0d1929,
+          color: on ? color : 0x0d2018,
           emissive: on ? color : 0x000000,
-          emissiveIntensity: on ? 0.9 : 0,
+          emissiveIntensity: on ? 0.8 : 0,
           transparent: true,
           opacity: on ? 1 : 0.3,
         });
 
-        // Front face
         const win = new THREE.Mesh(geo, mat);
         const xOff = (col / (cols - 1) - 0.5) * (cfg.w * 0.7);
         const yOff = 0.8 + row * 1.1;
@@ -351,15 +366,15 @@ export class Landing {
   }
 
   addGround() {
-    // Ground grid
-    const gridHelper = new THREE.GridHelper(80, 40, 0x0d2233, 0x0a1520);
+    // Ground grid — forest green tones
+    const gridHelper = new THREE.GridHelper(80, 40, 0x1a3d28, 0x142a1e);
     gridHelper.position.y = 0;
     this.scene.add(gridHelper);
 
     // Ground plane
     const geo = new THREE.PlaneGeometry(200, 200);
     const mat = new THREE.MeshStandardMaterial({
-      color: 0x070b12,
+      color: 0x0a1810,
       roughness: 1,
       metalness: 0,
     });
@@ -370,28 +385,28 @@ export class Landing {
   }
 
   addLights() {
-    // Ambient
-    const ambient = new THREE.AmbientLight(0x0a1929, 1.5);
+    // Ambient — deep forest
+    const ambient = new THREE.AmbientLight(0x0a2015, 1.5);
     this.scene.add(ambient);
 
-    // Directional
-    const dir = new THREE.DirectionalLight(0x2244aa, 0.8);
+    // Directional — warm sunlight
+    const dir = new THREE.DirectionalLight(0x8fba7a, 0.6);
     dir.position.set(-10, 20, 10);
     this.scene.add(dir);
 
-    // Accent fill — teal
-    const teal = new THREE.PointLight(0x00d4ff, 1.2, 40);
-    teal.position.set(5, 20, -10);
-    this.scene.add(teal);
+    // Accent fill — forest green
+    const green = new THREE.PointLight(0x6dbf82, 1.0, 45);
+    green.position.set(5, 20, -10);
+    this.scene.add(green);
 
-    // Accent fill — violet
-    const violet = new THREE.PointLight(0x8b5cf6, 0.8, 35);
-    violet.position.set(-8, 15, 5);
-    this.scene.add(violet);
+    // Accent fill — warm earth
+    const earth = new THREE.PointLight(0xc9975a, 0.6, 35);
+    earth.position.set(-8, 15, 5);
+    this.scene.add(earth);
   }
 
-  addFloatingParticles() {
-    const count = 300;
+  addFloatingDust() {
+    const count = 250;
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       positions[i * 3]     = (Math.random() - 0.5) * 60;
@@ -401,10 +416,10 @@ export class Landing {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const mat = new THREE.PointsMaterial({
-      color: 0x00d4ff,
-      size: 0.08,
+      color: 0x6dbf82,
+      size: 0.06,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.4,
     });
     this.particles = new THREE.Points(geo, mat);
     this.scene.add(this.particles);
@@ -422,12 +437,12 @@ export class Landing {
     this.camera.position.y = 18 + Math.sin(t * 0.08) * 2;
     this.camera.lookAt(0, 4, 0);
 
-    // Rotate stars slowly
-    if (this.stars) this.stars.rotation.y = t * 0.01;
+    // Rotate particles slowly
+    if (this.stars) this.stars.rotation.y = t * 0.008;
 
-    // Drift particles
+    // Drift dust particles
     if (this.particles) {
-      this.particles.rotation.y = t * 0.02;
+      this.particles.rotation.y = t * 0.015;
       this.particles.position.y = Math.sin(t * 0.3) * 0.5;
     }
 

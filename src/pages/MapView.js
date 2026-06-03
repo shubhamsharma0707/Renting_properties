@@ -34,7 +34,7 @@ export class MapView {
             <button class="btn btn-ghost" id="back-btn" style="padding:6px 12px;" title="Back to search">
               ← Back
             </button>
-            <div class="sidebar-logo">🏠 RentRadar</div>
+            <div class="sidebar-logo">RentRadar</div>
           </div>
 
           <!-- Search bar -->
@@ -201,10 +201,10 @@ export class MapView {
 
     } catch (err) {
       console.error('Search failed:', err);
-      showToast('⚠️ Could not load properties. Is the backend running?');
+      showToast('Could not load properties. Is the backend running?');
       document.getElementById('results-area').innerHTML = `
         <div class="no-results">
-          <div class="icon">⚠️</div>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <strong>Could not load properties</strong>
           <p>${err.message}</p>
           <p style="font-size:0.75rem;margin-top:4px;color:var(--text-muted);">Make sure backend is running: <code>npm run server</code></p>
@@ -223,7 +223,7 @@ export class MapView {
     if (!filtered.length) {
       area.innerHTML = `
         <div class="no-results">
-          <div class="icon">🏠</div>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
           <strong>No properties found</strong>
           <p>Try a broader search, different location, or increase your budget.</p>
         </div>
@@ -332,15 +332,15 @@ export class MapView {
       if (!prop.lat || !prop.lng) return;
 
       const status = getBudgetStatus(prop.price, budget);
-      const color  = { 'in-budget': '#22c55e', 'near-budget': '#f59e0b', 'over-budget': '#ef4444' }[status];
-      const shadow = { 'in-budget': 'rgba(34,197,94,0.4)', 'near-budget': 'rgba(245,158,11,0.4)', 'over-budget': 'rgba(239,68,68,0.4)' }[status];
+      const color  = { 'in-budget': '#5cbf78', 'near-budget': '#d4a04a', 'over-budget': '#d46a5a' }[status];
+      const shadow = { 'in-budget': 'rgba(92,191,120,0.4)', 'near-budget': 'rgba(212,160,74,0.4)', 'over-budget': 'rgba(212,106,90,0.4)' }[status];
 
-      // Custom HTML marker
+      // Custom HTML marker — nature themed
       const icon = L.divIcon({
         className: '',
         html: `
           <div style="
-            background:#0d1117;
+            background:#111f18;
             border:2px solid ${color};
             border-radius:20px;
             padding:4px 10px;
@@ -349,7 +349,7 @@ export class MapView {
             color:${color};
             white-space:nowrap;
             box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 12px ${shadow};
-            font-family:'Space Grotesk',sans-serif;
+            font-family:'Plus Jakarta Sans',sans-serif;
             animation:markerDrop 0.4s cubic-bezier(0.34,1.56,0.64,1) ${i * 40}ms both;
             position:relative;
           ">
@@ -387,19 +387,19 @@ export class MapView {
 
   buildPopupHTML(prop, color) {
     return `
-      <div style="font-family:Inter,sans-serif;min-width:200px;">
-        <div style="font-weight:700;font-size:0.88rem;margin-bottom:3px;color:#f0f4ff;">${prop.name}</div>
-        <div style="font-size:0.72rem;color:#8892a4;margin-bottom:8px;">${prop.address}</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:200px;">
+        <div style="font-weight:700;font-size:0.88rem;margin-bottom:3px;color:#e8f0e4;">${prop.name}</div>
+        <div style="font-size:0.72rem;color:#577057;margin-bottom:8px;">${prop.address}</div>
         <div style="font-size:1.05rem;font-weight:800;color:${color};margin-bottom:4px;">
           ₹${prop.price.toLocaleString('en-IN')}/mo
         </div>
-        <div style="font-size:0.72rem;color:#8892a4;">
+        <div style="font-size:0.72rem;color:#9ab89a;">
           ${prop.bhk} BHK · ${prop.type}${prop.area ? ` · ${prop.area} sq ft` : ''}
         </div>
-        ${prop.distance ? `<div style="font-size:0.68rem;color:#4a5568;margin-top:3px;">📍 ${prop.distance} km away</div>` : ''}
+        ${prop.distance ? `<div style="font-size:0.68rem;color:#577057;margin-top:3px;">${prop.distance} km away</div>` : ''}
         ${prop.amenities?.length ? `
           <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;">
-            ${prop.amenities.slice(0, 3).map(a => `<span style="font-size:0.62rem;background:rgba(0,212,255,0.1);color:#00d4ff;padding:2px 5px;border-radius:3px;">${a}</span>`).join('')}
+            ${prop.amenities.slice(0, 3).map(a => `<span style="font-size:0.62rem;background:rgba(109,191,130,0.1);color:#6dbf82;padding:2px 5px;border-radius:3px;">${a}</span>`).join('')}
           </div>
         ` : ''}
       </div>
@@ -412,25 +412,25 @@ export class MapView {
     style.id = 'leaflet-popup-style';
     style.textContent = `
       .dark-popup .leaflet-popup-content-wrapper {
-        background: #0d1117 !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
+        background: #111f18 !important;
+        border: 1px solid rgba(109,191,130,0.2) !important;
         border-radius: 12px !important;
         box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
-        color: #f0f4ff !important;
+        color: #e8f0e4 !important;
       }
       .dark-popup .leaflet-popup-tip {
-        background: #0d1117 !important;
+        background: #111f18 !important;
       }
       .dark-popup .leaflet-popup-close-button {
-        color: #8892a4 !important;
+        color: #9ab89a !important;
       }
       .leaflet-control-zoom a {
-        background: #0d1117 !important;
-        color: #f0f4ff !important;
-        border-color: rgba(255,255,255,0.1) !important;
+        background: #111f18 !important;
+        color: #e8f0e4 !important;
+        border-color: rgba(109,191,130,0.15) !important;
       }
-      .leaflet-control-zoom a:hover { background: #1a2535 !important; }
-      .leaflet-bar { border: 1px solid rgba(255,255,255,0.1) !important; }
+      .leaflet-control-zoom a:hover { background: #162b1f !important; }
+      .leaflet-bar { border: 1px solid rgba(109,191,130,0.15) !important; }
       @keyframes markerDrop {
         from { opacity:0; transform: translateY(-16px) scale(0.6); }
         to   { opacity:1; transform: translateY(0) scale(1); }
