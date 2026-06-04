@@ -117,20 +117,20 @@ export class Landing {
             </div>
           </div>
 
-          <div style="display:flex;gap:40px;margin-top:32px;animation:fadeSlideUp 0.8s 0.5s ease both;">
+          <div style="display:flex;gap:40px;margin-top:36px;animation:fadeSlideUp 0.8s 0.5s ease both;">
             <div style="text-align:center;">
-              <div style="font-family:var(--font-body);font-size:1.6rem;font-weight:800;color:var(--accent);">50K+</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Listings</div>
+              <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:400;color:#fff;letter-spacing:0.01em;">50K+</div>
+              <div style="font-size:0.62rem;color:rgba(160,200,240,0.45);text-transform:uppercase;letter-spacing:0.18em;margin-top:4px;">Listings</div>
             </div>
-            <div style="width:1px;background:var(--border);"></div>
+            <div style="width:1px;background:rgba(160,200,240,0.12);"></div>
             <div style="text-align:center;">
-              <div style="font-family:var(--font-body);font-size:1.6rem;font-weight:800;color:var(--earth);">30+</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Cities</div>
+              <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:400;color:var(--accent);letter-spacing:0.01em;">30+</div>
+              <div style="font-size:0.62rem;color:rgba(160,200,240,0.45);text-transform:uppercase;letter-spacing:0.18em;margin-top:4px;">Cities</div>
             </div>
-            <div style="width:1px;background:var(--border);"></div>
+            <div style="width:1px;background:rgba(160,200,240,0.12);"></div>
             <div style="text-align:center;">
-              <div style="font-family:var(--font-body);font-size:1.6rem;font-weight:800;color:var(--green);">Live</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px;">Pricing</div>
+              <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:400;color:var(--accent-bright);letter-spacing:0.01em;">Live</div>
+              <div style="font-size:0.62rem;color:rgba(160,200,240,0.45);text-transform:uppercase;letter-spacing:0.18em;margin-top:4px;">Pricing</div>
             </div>
           </div>
         </div>
@@ -213,13 +213,13 @@ export class Landing {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    this.renderer.setClearColor(0x0d1f17, 1);
+    this.renderer.setClearColor(0x080f18, 1);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.1;
+    this.renderer.toneMappingExposure = 0.85;
 
     // Scene
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x0d1f17, 0.02);
+    this.scene.fog = new THREE.FogExp2(0x080f18, 0.020);
 
     // Camera
     this.camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 200);
@@ -252,11 +252,11 @@ export class Landing {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const mat = new THREE.PointsMaterial({
-      color: 0x6dbf82,
-      size: 0.12,
+      color: 0xa8c4d8,
+      size: 0.10,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.22,
     });
     this.stars = new THREE.Points(geo, mat);
     this.scene.add(this.stars);
@@ -297,11 +297,11 @@ export class Landing {
       // Main building body — earthy forest tones
       const geo = new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d);
       const mat = new THREE.MeshStandardMaterial({
-        color: cfg.accent ? 0x1a3d28 : 0x142a1e,
-        emissive: cfg.accent ? 0x0a2018 : 0x050e08,
-        emissiveIntensity: 0.3,
-        roughness: 0.85,
-        metalness: 0.1,
+        color: cfg.accent ? 0x0e1828 : 0x0a1020,
+        emissive: cfg.accent ? 0x060e18 : 0x030608,
+        emissiveIntensity: 0.35,
+        roughness: 0.88,
+        metalness: 0.12,
       });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(cfg.x, cfg.h / 2, cfg.z);
@@ -313,16 +313,16 @@ export class Landing {
       if (cfg.accent) {
         const topGeo = new THREE.BoxGeometry(cfg.w * 0.6, 0.15, cfg.d * 0.6);
         const topMat = new THREE.MeshStandardMaterial({
-          color: 0x6dbf82,
-          emissive: 0x6dbf82,
-          emissiveIntensity: 2.0,
+          color: 0xa8c4d8,
+          emissive: 0xa8c4d8,
+          emissiveIntensity: 1.6,
         });
         const top = new THREE.Mesh(topGeo, topMat);
         top.position.set(cfg.x, cfg.h + 0.08, cfg.z);
         this.buildings.add(top);
 
-        // Point light — green
-        const light = new THREE.PointLight(0x6dbf82, 0.6, 6);
+        // Point light — ice blue
+        const light = new THREE.PointLight(0xa8c4d8, 0.5, 6);
         light.position.set(cfg.x, cfg.h + 0.5, cfg.z);
         this.buildings.add(light);
       }
@@ -344,16 +344,16 @@ export class Landing {
         if (Math.random() > 0.65) continue;
 
         const on = Math.random() > 0.25;
-        // warm amber and soft green window lights
-        const color = Math.random() > 0.5 ? 0xc9975a : 0x6dbf82;
+        // cool silver-blue window lights
+        const color = Math.random() > 0.5 ? 0x8aaccC : 0xc8d8f0;
 
         const geo = new THREE.PlaneGeometry(winW, winH);
         const mat = new THREE.MeshStandardMaterial({
-          color: on ? color : 0x0d2018,
+          color: on ? color : 0x060a10,
           emissive: on ? color : 0x000000,
-          emissiveIntensity: on ? 0.8 : 0,
+          emissiveIntensity: on ? 0.6 : 0,
           transparent: true,
-          opacity: on ? 1 : 0.3,
+          opacity: on ? 1 : 0.15,
         });
 
         const win = new THREE.Mesh(geo, mat);
@@ -367,14 +367,14 @@ export class Landing {
 
   addGround() {
     // Ground grid — forest green tones
-    const gridHelper = new THREE.GridHelper(80, 40, 0x1a3d28, 0x142a1e);
+    const gridHelper = new THREE.GridHelper(80, 40, 0x0e1828, 0x080f18);
     gridHelper.position.y = 0;
     this.scene.add(gridHelper);
 
     // Ground plane
     const geo = new THREE.PlaneGeometry(200, 200);
     const mat = new THREE.MeshStandardMaterial({
-      color: 0x0a1810,
+      color: 0x060c14,
       roughness: 1,
       metalness: 0,
     });
@@ -385,24 +385,24 @@ export class Landing {
   }
 
   addLights() {
-    // Ambient — deep forest
-    const ambient = new THREE.AmbientLight(0x0a2015, 1.5);
+    // Ambient — deep navy
+    const ambient = new THREE.AmbientLight(0x0a1828, 2.0);
     this.scene.add(ambient);
 
-    // Directional — warm sunlight
-    const dir = new THREE.DirectionalLight(0x8fba7a, 0.6);
+    // Directional — cold moonlight
+    const dir = new THREE.DirectionalLight(0x8aa8c8, 0.45);
     dir.position.set(-10, 20, 10);
     this.scene.add(dir);
 
-    // Accent fill — forest green
-    const green = new THREE.PointLight(0x6dbf82, 1.0, 45);
-    green.position.set(5, 20, -10);
-    this.scene.add(green);
+    // Accent fill — ice blue
+    const blue = new THREE.PointLight(0x6090c0, 0.8, 48);
+    blue.position.set(5, 20, -10);
+    this.scene.add(blue);
 
-    // Accent fill — warm earth
-    const earth = new THREE.PointLight(0xc9975a, 0.6, 35);
-    earth.position.set(-8, 15, 5);
-    this.scene.add(earth);
+    // Accent fill — deep steel
+    const steel = new THREE.PointLight(0x304060, 0.5, 36);
+    steel.position.set(-8, 15, 5);
+    this.scene.add(steel);
   }
 
   addFloatingDust() {
@@ -416,10 +416,10 @@ export class Landing {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const mat = new THREE.PointsMaterial({
-      color: 0x6dbf82,
-      size: 0.06,
+      color: 0xa8c4d8,
+      size: 0.05,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.25,
     });
     this.particles = new THREE.Points(geo, mat);
     this.scene.add(this.particles);

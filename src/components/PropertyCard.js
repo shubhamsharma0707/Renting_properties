@@ -8,12 +8,12 @@ const TYPE_SVG = {
   studio: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
 };
 
-// Gradient themes per property type — earthy greens & browns
+// Gradient themes per property type — navy frost
 const CARD_GRADIENTS = {
-  flat:   ['135deg, #1a3d28 0%, #2d5a3a 50%, #142a1e 100%', '#6dbf82'],
-  house:  ['135deg, #2a2018 0%, #3d3020 50%, #1a1208 100%', '#c9975a'],
-  pg:     ['135deg, #1a3028 0%, #253d30 50%, #162820 100%', '#8aad8a'],
-  studio: ['135deg, #281a10 0%, #3d2a18 50%, #1a0e08 100%', '#d4a04a'],
+  flat:   ['135deg, #0c1520 0%, #142030 50%, #080f18 100%', '#a8c4d8'],
+  house:  ['135deg, #0e1828 0%, #182840 50%, #08101c 100%', '#c8d8e8'],
+  pg:     ['135deg, #101820 0%, #182030 50%, #0a1018 100%', '#7898b0'],
+  studio: ['135deg, #0a1420 0%, #101c2c 50%, #080e18 100%', '#d8eaf8'],
 };
 
 export class PropertyCard {
@@ -126,13 +126,19 @@ export class PropertyCard {
         ` : ''}
 
         <div class="card-footer">
-          <button class="btn btn-primary" style="font-size:0.72rem;padding:6px 12px;flex:1;" onclick="void 0">
+          <button class="btn btn-primary card-map-btn" style="font-size:0.72rem;padding:6px 12px;flex:1;">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             View on Map
           </button>
+          ${p.url ? `
+            <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size:0.72rem;padding:6px 10px;" title="Open original listing" onclick="event.stopPropagation()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          ` : ''}
           ${p.contactPhone ? `
-            <a href="tel:${p.contactPhone}" class="btn btn-secondary" style="font-size:0.72rem;padding:6px 12px;" title="${p.contactName || 'Contact owner'}">
+            <a href="tel:${p.contactPhone}" class="btn btn-secondary" style="font-size:0.72rem;padding:6px 12px;gap:5px;" title="Call ${p.contactName || 'owner'}" onclick="event.stopPropagation()">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l1.97-1.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              ${p.contactName ? `<span style="max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.contactName.split(' ')[0]}</span>` : 'Call'}
             </a>
           ` : ''}
           <span class="source-badge ${sourceBadgeClass}">${sourceLabel}</span>

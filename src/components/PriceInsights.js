@@ -65,7 +65,7 @@ export class PriceInsights {
         </div>
       </div>
 
-      <div style="font-size:0.78rem;color:var(--text-secondary);padding:8px 12px;background:rgba(109,191,130,0.04);border-radius:6px;border-left:2px solid var(--accent);margin-bottom:8px;display:flex;align-items:flex-start;gap:6px;">
+      <div style="font-size:0.74rem;color:var(--text-secondary);padding:8px 12px;background:rgba(168,196,216,0.04);border-radius:6px;border-left:2px solid rgba(168,196,216,0.35);margin-bottom:8px;display:flex;align-items:flex-start;gap:6px;">
         <svg style="flex-shrink:0;margin-top:1px;" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <span>${i.recommendation}</span>
       </div>
@@ -74,8 +74,8 @@ export class PriceInsights {
       <div id="ai-advice-block" style="
         display:flex;align-items:flex-start;gap:10px;
         padding:10px 12px;
-        background:rgba(109,191,130,0.06);
-        border:1px solid rgba(109,191,130,0.2);
+        background:rgba(168,196,216,0.04);
+        border:1px solid rgba(168,196,216,0.14);
         border-radius:8px;
         min-height:44px;
       ">

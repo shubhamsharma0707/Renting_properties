@@ -105,17 +105,17 @@ export class MapView {
 
           <!-- Legend -->
           <div style="display:flex;gap:16px;align-items:center;padding:6px 2px;flex-shrink:0;">
-            <span style="font-size:0.7rem;color:var(--text-muted);">LEGEND:</span>
-            <div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--green);">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);"></div> In budget
+            <span style="font-size:0.65rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;">Legend:</span>
+            <div style="display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--green);">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);"></div> In budget
             </div>
-            <div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--amber);">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);box-shadow:0 0 6px var(--amber);"></div> Slightly over
+            <div style="display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--amber);">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 5px var(--amber);"></div> Slightly over
             </div>
-            <div style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--red);">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);"></div> Over budget
+            <div style="display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--red);">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red);"></div> Over budget
             </div>
-            <div style="margin-left:auto;font-size:0.65rem;color:var(--text-muted);">© OpenStreetMap contributors</div>
+            <div style="margin-left:auto;font-size:0.6rem;color:var(--text-muted);">© OpenStreetMap contributors</div>
           </div>
         </div>
       </div>
@@ -234,8 +234,24 @@ export class MapView {
     area.innerHTML = '';
     filtered.forEach((prop, i) => {
       const card = new PropertyCard(prop, this.params.budget, i);
+      // Card body click → pan map to this property
       card.onClick = () => this.selectProperty(prop);
       area.appendChild(card.element);
+
+      // Wire up "View on Map" button specifically (doesn't bubble to card.onClick)
+      const mapBtn = card.element.querySelector('.card-map-btn');
+      if (mapBtn) {
+        mapBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.selectProperty(prop);
+          // Open popup on the matching marker
+          const marker = this.markers.find(m => {
+            const ll = m.getLatLng();
+            return Math.abs(ll.lat - prop.lat) < 0.0001 && Math.abs(ll.lng - prop.lng) < 0.0001;
+          });
+          marker?.openPopup();
+        });
+      }
     });
   }
 
@@ -332,24 +348,25 @@ export class MapView {
       if (!prop.lat || !prop.lng) return;
 
       const status = getBudgetStatus(prop.price, budget);
-      const color  = { 'in-budget': '#5cbf78', 'near-budget': '#d4a04a', 'over-budget': '#d46a5a' }[status];
-      const shadow = { 'in-budget': 'rgba(92,191,120,0.4)', 'near-budget': 'rgba(212,160,74,0.4)', 'over-budget': 'rgba(212,106,90,0.4)' }[status];
+      const color  = { 'in-budget': '#6aad8a', 'near-budget': '#b8a060', 'over-budget': '#b06060' }[status];
+      const shadow = { 'in-budget': 'rgba(106,173,138,0.3)', 'near-budget': 'rgba(184,160,96,0.3)', 'over-budget': 'rgba(176,96,96,0.3)' }[status];
 
       // Custom HTML marker — nature themed
       const icon = L.divIcon({
         className: '',
         html: `
           <div style="
-            background:#111f18;
-            border:2px solid ${color};
-            border-radius:20px;
-            padding:4px 10px;
+            background:#0c1520;
+            border:1px solid ${color}40;
+            border-radius:14px;
+            padding:3px 10px;
             font-size:11px;
-            font-weight:700;
+            font-weight:500;
             color:${color};
             white-space:nowrap;
-            box-shadow:0 4px 14px rgba(0,0,0,0.5),0 0 12px ${shadow};
-            font-family:'Plus Jakarta Sans',sans-serif;
+            box-shadow:0 4px 20px rgba(0,0,0,0.75),0 0 8px ${shadow};
+            font-family:'Jost',sans-serif;
+            letter-spacing:0.04em;
             animation:markerDrop 0.4s cubic-bezier(0.34,1.56,0.64,1) ${i * 40}ms both;
             position:relative;
           ">
@@ -387,21 +404,22 @@ export class MapView {
 
   buildPopupHTML(prop, color) {
     return `
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:200px;">
-        <div style="font-weight:700;font-size:0.88rem;margin-bottom:3px;color:#e8f0e4;">${prop.name}</div>
-        <div style="font-size:0.72rem;color:#577057;margin-bottom:8px;">${prop.address}</div>
-        <div style="font-size:1.05rem;font-weight:800;color:${color};margin-bottom:4px;">
+      <div style="font-family:'Jost',sans-serif;min-width:200px;">
+        <div style="font-weight:500;font-size:0.85rem;margin-bottom:3px;color:#e8f0f8;letter-spacing:0.02em;font-family:'Playfair Display',serif;">${prop.name}</div>
+        <div style="font-size:0.68rem;color:#3a4a5a;margin-bottom:8px;">${prop.address}</div>
+        <div style="font-size:1.05rem;font-weight:500;color:${color};margin-bottom:4px;font-family:'Playfair Display',serif;letter-spacing:0.02em;">
           ₹${prop.price.toLocaleString('en-IN')}/mo
         </div>
-        <div style="font-size:0.72rem;color:#9ab89a;">
+        <div style="font-size:0.68rem;color:#8090a8;">
           ${prop.bhk} BHK · ${prop.type}${prop.area ? ` · ${prop.area} sq ft` : ''}
         </div>
-        ${prop.distance ? `<div style="font-size:0.68rem;color:#577057;margin-top:3px;">${prop.distance} km away</div>` : ''}
+        ${prop.distance ? `<div style="font-size:0.64rem;color:#3a4a5a;margin-top:3px;">${prop.distance} km away</div>` : ''}
         ${prop.amenities?.length ? `
           <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;">
-            ${prop.amenities.slice(0, 3).map(a => `<span style="font-size:0.62rem;background:rgba(109,191,130,0.1);color:#6dbf82;padding:2px 5px;border-radius:3px;">${a}</span>`).join('')}
+            ${prop.amenities.slice(0, 3).map(a => `<span style="font-size:0.58rem;background:rgba(168,196,216,0.08);color:#a8c4d8;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;text-transform:uppercase;">${a}</span>`).join('')}
           </div>
         ` : ''}
+        ${prop.contactName ? `<div style="font-size:0.64rem;color:#8090a8;margin-top:6px;border-top:1px solid rgba(168,196,216,0.1);padding-top:5px;">Contact: <strong style="color:#a8c4d8;">${prop.contactName}</strong></div>` : ''}
       </div>
     `;
   }
@@ -412,25 +430,25 @@ export class MapView {
     style.id = 'leaflet-popup-style';
     style.textContent = `
       .dark-popup .leaflet-popup-content-wrapper {
-        background: #111f18 !important;
-        border: 1px solid rgba(109,191,130,0.2) !important;
-        border-radius: 12px !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
-        color: #e8f0e4 !important;
+        background: #0c1520 !important;
+        border: 1px solid rgba(168,196,216,0.18) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.85) !important;
+        color: #e8f0f8 !important;
       }
       .dark-popup .leaflet-popup-tip {
-        background: #111f18 !important;
+        background: #0c1520 !important;
       }
       .dark-popup .leaflet-popup-close-button {
-        color: #9ab89a !important;
+        color: #8090a8 !important;
       }
       .leaflet-control-zoom a {
-        background: #111f18 !important;
-        color: #e8f0e4 !important;
-        border-color: rgba(109,191,130,0.15) !important;
+        background: #0c1520 !important;
+        color: #e8f0f8 !important;
+        border-color: rgba(160,200,240,0.15) !important;
       }
-      .leaflet-control-zoom a:hover { background: #162b1f !important; }
-      .leaflet-bar { border: 1px solid rgba(109,191,130,0.15) !important; }
+      .leaflet-control-zoom a:hover { background: #111e2e !important; }
+      .leaflet-bar { border: 1px solid rgba(160,200,240,0.12) !important; }
       @keyframes markerDrop {
         from { opacity:0; transform: translateY(-16px) scale(0.6); }
         to   { opacity:1; transform: translateY(0) scale(1); }

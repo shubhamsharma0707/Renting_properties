@@ -220,6 +220,7 @@ export function generateMockListings(location, budget, type = 'all', bhk = 'all'
     const amenityCount = 2 + Math.floor(Math.random() * 5);
     const amenities = [...ALL_AMENITIES].sort(() => Math.random() - 0.5).slice(0, amenityCount);
 
+    const searchQuery = encodeURIComponent(`${name} ${locality} ${location.split(',')[0].trim()}`);
     properties.push({
       id: `mock_${i}_${Date.now()}`,
       name: `${name}`,
@@ -241,6 +242,7 @@ export function generateMockListings(location, budget, type = 'all', bhk = 'all'
       deposit: price * (2 + Math.floor(Math.random() * 4)),
       contactName: randomContactName(),
       contactPhone: randomPhone(),
+      url: `https://www.99acres.com/search/property/rent/${encodeURIComponent(location.split(',')[0].trim().toLowerCase().replace(/\s+/g, '-'))}?budget_max=${price + 2000}&bedrooms=${bhkNum}`,
     });
   }
 
