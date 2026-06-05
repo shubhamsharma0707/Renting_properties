@@ -17,5 +17,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    target: 'es2020',
+    // Split large vendor libs into separate chunks for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three:   ['three'],
+          leaflet: ['leaflet'],
+        }
+      }
+    }
   }
 });

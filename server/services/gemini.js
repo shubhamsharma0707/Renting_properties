@@ -21,7 +21,7 @@ export async function getAIAdvice(location, budget, properties, insights) {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const topProps = properties.slice(0, 5).map(p =>
       `- ${p.name}: ₹${p.price.toLocaleString('en-IN')}/mo, ${p.bhk} BHK ${p.type}, ${p.area || '?'} sqft`

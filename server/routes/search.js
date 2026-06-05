@@ -22,8 +22,8 @@ router.get('/search', async (req, res) => {
     } = req.query;
 
     const budgetNum = parseInt(budget, 10);
-    if (isNaN(budgetNum) || budgetNum < 1000) {
-      return res.status(400).json({ error: 'Invalid budget value' });
+    if (isNaN(budgetNum) || budgetNum < 1000 || budgetNum > 500_000) {
+      return res.status(400).json({ error: 'Budget must be between ₹1,000 and ₹5,00,000' });
     }
 
     console.log(`\n🔍 Searching: "${location}" | ₹${budgetNum.toLocaleString('en-IN')} | ${type} | ${bhk} BHK`);
@@ -130,15 +130,16 @@ router.get('/search', async (req, res) => {
       center = { lat: 12.9716, lng: 77.5946 }; // Bangalore default
     }
 
+    const pagedProperties = properties.slice(0, 30); // Max 30 per request
     res.json({
       success: true,
       dataSource,
       location,
       budget: budgetNum,
       center,
-      properties: properties.slice(0, 30), // Max 30 per request
+      properties: pagedProperties,
       insights,
-      total: properties.length
+      total: pagedProperties.length
     });
 
   } catch (err) {

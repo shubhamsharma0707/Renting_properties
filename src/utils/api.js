@@ -37,25 +37,36 @@ export async function geocodeAddress(address) {
 }
 
 /**
- * Format a number as Indian Rupee
+ * Format a number as Indian Rupee (compact notation)
+ * - Handles edge cases: 0, negative, non-numeric
+ * @param {number} amount
+ * @returns {string}
  */
 export function formatINR(amount) {
-  if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
-  if (amount >= 1000) return `₹${(amount / 1000).toFixed(0)}K`;
+  if (typeof amount !== 'number' || isNaN(amount)) return '—';
+  if (amount <= 0) return '₹0';
+  if (amount >= 10_000_000) return `₹${(amount / 10_000_000).toFixed(1)}Cr`;
+  if (amount >= 100_000)    return `₹${(amount / 100_000).toFixed(1)}L`;
+  if (amount >= 1_000)      return `₹${(amount / 1_000).toFixed(0)}K`;
   return `₹${amount}`;
 }
 
 /**
  * Get budget status: 'in-budget' | 'near-budget' | 'over-budget'
+ * @param {number} price
+ * @param {number} budget
+ * @returns {'in-budget'|'near-budget'|'over-budget'}
  */
 export function getBudgetStatus(price, budget) {
-  if (price <= budget) return 'in-budget';
-  if (price <= budget * 1.2) return 'near-budget';
+  if (price <= budget)        return 'in-budget';
+  if (price <= budget * 1.2)  return 'near-budget';
   return 'over-budget';
 }
 
 /**
  * Show a toast notification
+ * @param {string} message
+ * @param {number} [duration=3000]
  */
 export function showToast(message, duration = 3000) {
   let toast = document.querySelector('.toast');
@@ -67,4 +78,18 @@ export function showToast(message, duration = 3000) {
   toast.textContent = message;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+/**
+ * Debounce a function call
+ * @param {Function} fn
+ * @param {number} delay  milliseconds
+ * @returns {Function}
+ */
+export function debounce(fn, delay = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
 }

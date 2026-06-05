@@ -153,7 +153,7 @@ export class MapView {
       this.params.budget = parseInt(e.target.value);
       budgetLabel.textContent = formatINR(this.params.budget);
       this.updateSliderGradient(budgetSlider);
-      this.refreshCards();
+      this.refreshCards();   // re-render cards + markers with new budget threshold
     });
     this.updateSliderGradient(budgetSlider);
 
