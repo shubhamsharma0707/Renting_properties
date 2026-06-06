@@ -281,6 +281,10 @@ export function getMockInsights(properties, budget, location) {
     recommendation = `Budget is tight for ${location}. Avg rent here is ₹${avgPrice.toLocaleString('en-IN')}. PG or shared accommodation recommended.`;
   }
 
+  // Deterministic trend: rising if avg price > budget, stable otherwise
+  const marketTrend = avgPrice > budget * 0.85 ? 'rising' : 'stable';
+  const trendPercent = (((avgPrice - budget * 0.7) / (budget * 0.7)) * 10).toFixed(1);
+
   return {
     avgPrice,
     medianPrice,
@@ -290,8 +294,8 @@ export function getMockInsights(properties, budget, location) {
     totalCount: properties.length,
     budgetPercentile,
     recommendation,
-    marketTrend: Math.random() > 0.5 ? 'rising' : 'stable',
-    trendPercent: (Math.random() * 8 + 2).toFixed(1),
+    marketTrend,
+    trendPercent: Math.max(0, parseFloat(trendPercent)).toFixed(1),
   };
 }
 
@@ -343,9 +347,14 @@ function generateArea(bhk) {
 }
 
 function pickUnique(arr, used) {
+  if (!arr || arr.length === 0) return 'Rental Property';
   const available = arr.filter(x => !used.has(x));
-  if (!available.length) used.clear();
-  const pick = available[Math.floor(Math.random() * available.length)] || arr[0];
+  // Reset used set when all options exhausted
+  if (available.length === 0) {
+    used.clear();
+    arr.forEach(x => { if (!used.has(x)) available.push(x); });
+  }
+  const pick = available[Math.floor(Math.random() * available.length)];
   used.add(pick);
   return pick;
 }

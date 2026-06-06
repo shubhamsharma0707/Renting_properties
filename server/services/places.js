@@ -133,9 +133,10 @@ function calculateDistance(from, to) {
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((from.lat * Math.PI) / 180) *
-    Math.cos((to.lat * Math.PI) / 180) *
+    Math.cos((to.lat  * Math.PI) / 180) *
     Math.sin(dLng / 2) ** 2;
-  return Math.round(Math.sqrt(Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))) * R * 10) / 10;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(c * R * 10) / 10;
 }
 
 function generateAmenities() {

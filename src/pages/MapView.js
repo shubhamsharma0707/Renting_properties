@@ -406,14 +406,14 @@ export class MapView {
     return `
       <div style="font-family:'Jost',sans-serif;min-width:200px;">
         <div style="font-weight:500;font-size:0.85rem;margin-bottom:3px;color:#e8f0f8;letter-spacing:0.02em;font-family:'Playfair Display',serif;">${prop.name}</div>
-        <div style="font-size:0.68rem;color:#3a4a5a;margin-bottom:8px;">${prop.address}</div>
+        <div style="font-size:0.68rem;color:#8090a8;margin-bottom:8px;">${prop.address}</div>
         <div style="font-size:1.05rem;font-weight:500;color:${color};margin-bottom:4px;font-family:'Playfair Display',serif;letter-spacing:0.02em;">
           ₹${prop.price.toLocaleString('en-IN')}/mo
         </div>
         <div style="font-size:0.68rem;color:#8090a8;">
           ${prop.bhk} BHK · ${prop.type}${prop.area ? ` · ${prop.area} sq ft` : ''}
         </div>
-        ${prop.distance ? `<div style="font-size:0.64rem;color:#3a4a5a;margin-top:3px;">${prop.distance} km away</div>` : ''}
+        ${prop.distance ? `<div style="font-size:0.64rem;color:#6a7a8a;margin-top:3px;">${prop.distance} km away</div>` : ''}
         ${prop.amenities?.length ? `
           <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;">
             ${prop.amenities.slice(0, 3).map(a => `<span style="font-size:0.58rem;background:rgba(168,196,216,0.08);color:#a8c4d8;padding:2px 5px;border-radius:3px;letter-spacing:0.06em;text-transform:uppercase;">${a}</span>`).join('')}

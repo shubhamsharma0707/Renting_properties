@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏠 RentRadar
+# RentRadar
 
 ### Smart Rental Property Finder for India
 
@@ -19,32 +19,32 @@
 
 ---
 
-## 📌 Overview
+## Overview
 
 **RentRadar** is a full-stack rental property discovery platform built specifically for the Indian market. It lets you search apartments, flats, PGs, and houses across any city in India — with live rental prices, an interactive dark map with colour-coded price markers, and AI-driven market analysis powered by Google Gemini.
 
-The UI is designed around a **Navy Frost glassmorphism** aesthetic — deep navy, soft frost whites, and animated accent gradients — topped with a fully animated Three.js 3D cityscape on the landing page.
+The UI uses a **Navy Frost glassmorphism** aesthetic — deep navy, soft frost whites, and animated accent gradients — with a fully animated Three.js 3D cityscape on the landing page.
 
 > **Zero API keys required to run.** RentRadar ships with a built-in mock data engine calibrated against real Indian market averages for 20+ cities, so you can explore the full experience without any signup.
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Details |
 |---------|---------|
-| 🗺️ **Any location in India** | Powered by OpenStreetMap Nominatim — no API key required |
-| 🌙 **Interactive dark map** | Leaflet.js + CartoDB Dark tiles, price markers colour-coded by budget |
-| 🤖 **Gemini AI insights** | Personalised market analysis, budget recommendations & neighbourhood tips |
-| 📡 **Real-time price signals** | SerpAPI fetches live listings from NoBroker, 99acres, and OLX |
-| 🏙️ **3D animated hero scene** | Three.js cityscape with Navy Frost + amber palette |
-| 🎚️ **Smart budget filtering** | Slider-based filtering with live market-percentile bar |
-| 📊 **Market insights panel** | Avg/min/max prices, in-budget count, and trend indicators |
-| 🔒 **Rate-limited API** | 100 req / 15 min per IP — safe for public deployment |
+| **Any location in India** | Powered by OpenStreetMap Nominatim — no API key required |
+| **Interactive dark map** | Leaflet.js + CartoDB Dark tiles, price markers colour-coded by budget |
+| **Gemini AI insights** | Personalised market analysis, budget recommendations & neighbourhood tips |
+| **Real-time price signals** | SerpAPI fetches live listings from NoBroker, 99acres, and OLX |
+| **3D animated hero scene** | Three.js cityscape with Navy Frost + amber palette |
+| **Smart budget filtering** | Slider-based filtering with live market-percentile bar |
+| **Market insights panel** | Avg/min/max prices, in-budget count, and trend indicators |
+| **Rate-limited API** | 100 req / 15 min per IP — safe for public deployment |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 | Technology | Role |
@@ -69,12 +69,12 @@ The UI is designed around a **Navy Frost glassmorphism** aesthetic — deep navy
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js** ≥ 18.x
-- **npm** ≥ 9.x
+- **Node.js** >= 18.x
+- **npm** >= 9.x
 
 ### Installation
 
@@ -97,16 +97,16 @@ Create a `.env` file in the project root. **All keys are optional** — the app 
 
 ```env
 # Google Maps API — enables Places data + precise geocoding
-# https://console.cloud.google.com → Enable: Places API, Geocoding API
-GOOGLE_MAPS_API_KEY=your_google_maps_key_here
+# https://console.cloud.google.com -> Enable: Places API, Geocoding API
+GOOGLE_MAPS_API_KEY=
 
 # SerpAPI — real-time rental listings from NoBroker, 99acres, OLX
-# Free tier: 100 searches/month → https://serpapi.com
-SERPAPI_KEY=your_serpapi_key_here
+# Free tier: 100 searches/month -> https://serpapi.com
+SERPAPI_KEY=
 
 # Google Gemini AI — market insights & budget advice
-# Free tier → https://aistudio.google.com/app/apikey
-GEMINI_API_KEY=your_gemini_api_key_here
+# Free tier -> https://aistudio.google.com/app/apikey
+GEMINI_API_KEY=
 
 # Server config
 PORT=3001
@@ -127,13 +127,13 @@ npm run dev
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Renting_properties/
 │
 ├── index.html                   # App entry point (SPA shell)
-├── vite.config.js               # Vite config + API proxy → :3001
+├── vite.config.js               # Vite config + API proxy -> :3001
 ├── package.json
 │
 ├── src/                         # Frontend (Vite + Vanilla JS)
@@ -153,7 +153,8 @@ Renting_properties/
 │   ├── index.js                 # Server entry + CORS + rate limiting
 │   ├── routes/
 │   │   └── search.js            # /api/search · /api/geocode · /api/ai-advice
-│   ├── scrapers/                # Web scraping utilities
+│   ├── scrapers/
+│   │   └── rentData.js          # Mock data engine + market insights
 │   └── services/
 │       ├── geocoder.js          # Nominatim + Google Maps geocoding
 │       ├── places.js            # Google Places API integration
@@ -167,7 +168,7 @@ Renting_properties/
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 ### `GET /api/search`
 Search rental properties for any Indian location.
@@ -177,7 +178,7 @@ Search rental properties for any Indian location.
 | Param | Type | Default | Description |
 |-------|------|---------|-------------|
 | `location` | `string` | `Koramangala, Bangalore` | City, area, or locality |
-| `budget` | `number` | `25000` | Max monthly rent in ₹ |
+| `budget` | `number` | `25000` | Max monthly rent in Rs (1000–500000) |
 | `type` | `string` | `all` | `flat` · `house` · `pg` · `studio` · `all` |
 | `bhk` | `string` | `all` | `1` · `2` · `3` · `all` |
 
@@ -243,7 +244,7 @@ Backend health check — returns server status and API key availability.
 
 ---
 
-## 🏙️ Supported Cities
+## Supported Cities
 
 Built-in calibrated rental price profiles for all major Indian markets:
 
@@ -262,7 +263,7 @@ Built-in calibrated rental price profiles for all major Indian markets:
 
 ---
 
-## 📜 Available Scripts
+## Available Scripts
 
 ```bash
 npm run dev      # Start frontend + backend concurrently (recommended)
@@ -274,7 +275,7 @@ npm run preview  # Preview production build locally
 
 ---
 
-## 🗄️ Data Sources
+## Data Sources
 
 | Source | What It Provides | API Key |
 |--------|-----------------|---------|
@@ -286,16 +287,17 @@ npm run preview  # Preview production build locally
 
 ---
 
-## 🔒 Security
+## Security
 
 - All API keys are stored in `.env` and excluded from version control via `.gitignore`
 - Rate limiting: **100 requests per 15 minutes** per IP on all `/api/*` routes
-- CORS restricted to `localhost:5173` and `localhost:4173` in development
+- `type` and `bhk` query params are validated against an allowlist — arbitrary values are rejected
+- CORS restricted to localhost and GitHub Pages in production
 - No sensitive data is stored or logged
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how to get started:
 
@@ -309,7 +311,7 @@ Please follow [Conventional Commits](https://www.conventionalcommits.org/) for c
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** — free to use, modify, and distribute.
 
@@ -317,10 +319,10 @@ This project is licensed under the **MIT License** — free to use, modify, and 
 
 <div align="center">
 
-**RentRadar** — Find your perfect home, smarter. 🏠
+**RentRadar** — Find your perfect home, smarter.
 
-Built with ❤️ by [Shubham Sharma](https://github.com/shubhamsharma0707)
+Built with care by [Shubham Sharma](https://github.com/shubhamsharma0707)
 
-⭐ Star this repo if you found it useful!
+Star this repo if you found it useful!
 
 </div>

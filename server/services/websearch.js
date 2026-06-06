@@ -81,7 +81,7 @@ function parseRentalFromSnippet(result, location, budget) {
     : 'flat';
 
   return {
-    id: `serp_${Math.random().toString(36).substr(2, 9)}`,
+    id: `serp_${Math.random().toString(36).substring(2, 11)}`,
     name: result.title.split('|')[0].trim().slice(0, 50),
     address: result.displayed_link || location,
     lat: null, // Will be approximated on frontend
@@ -107,7 +107,7 @@ function parseRealEstateResult(item, location) {
   if (isNaN(price)) return null;
 
   return {
-    id: `re_${Math.random().toString(36).substr(2, 9)}`,
+    id: `re_${Math.random().toString(36).substring(2, 11)}`,
     name: item.name || item.address || 'Rental Property',
     address: item.address || location,
     lat: item.gps_coordinates?.latitude || null,
