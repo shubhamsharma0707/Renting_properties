@@ -425,6 +425,26 @@ p { line-height: 1.7; }
   gap: 4px;
 }
 
+.card-address-link {
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+.card-address-link:hover {
+  color: var(--accent);
+}
+.card-address-link:hover .maps-ext-icon {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.maps-ext-icon {
+  opacity: 0;
+  flex-shrink: 0;
+  margin-left: 2px;
+  color: var(--accent);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
 .card-meta {
   display: flex;
   gap: 6px;
@@ -464,10 +484,72 @@ p { line-height: 1.7; }
 
 .card-footer {
   display: flex;
-  gap: 6px;
-  align-items: center;
+  flex-direction: column;
+  gap: 7px;
   margin-top: auto;
-  padding-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(168, 196, 216, 0.07);
+}
+
+.card-footer-primary {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.card-footer-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-map-btn {
+  flex: 1;
+  font-size: 0.7rem !important;
+  padding: 7px 10px !important;
+  justify-content: center;
+  letter-spacing: 0.06em;
+}
+
+.card-gmaps-btn {
+  flex: 1;
+  font-size: 0.7rem !important;
+  padding: 7px 10px !important;
+  justify-content: center;
+  letter-spacing: 0.06em;
+  background: rgba(78, 168, 222, 0.1);
+  color: #4ea8de;
+  border: 1px solid rgba(78, 168, 222, 0.3);
+  text-decoration: none;
+}
+.card-gmaps-btn:hover {
+  background: rgba(78, 168, 222, 0.18) !important;
+  border-color: rgba(78, 168, 222, 0.6) !important;
+  box-shadow: 0 0 12px rgba(78, 168, 222, 0.15);
+  color: #4ea8de;
+}
+
+.btn-icon-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 0;
+  transition: color 0.18s ease;
+}
+.btn-icon-link:hover {
+  color: var(--accent);
+}
+
+.btn-icon-link + .btn-icon-link::before {
+  content: '·';
+  margin-right: 4px;
+  color: var(--border);
 }
 
 .card-deposit {
@@ -486,6 +568,7 @@ p { line-height: 1.7; }
   letter-spacing: 0.1em;
   font-weight: 600;
   margin-left: auto;
+  flex-shrink: 0;
 }
 .source-badge.google  { background: rgba(168,196,216,0.08); color: var(--accent); }
 .source-badge.serp    { background: rgba(200,216,232,0.06); color: var(--earth); }

@@ -56,6 +56,11 @@ export class PropertyCard {
       ? p.address.replace(/https?:\/\/[^\s]+/g, '').trim().slice(0, 60)
       : 'Location available on request';
 
+    // Build Google Maps URL — prefer lat/lng for precision, fall back to search query
+    const mapsUrl = (p.lat && p.lng)
+      ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((cleanName + ' ' + address).trim())}`;
+
     const el = document.createElement('div');
     el.className = 'property-card';
     el.dataset.id = p.id;
@@ -95,12 +100,13 @@ export class PropertyCard {
           </div>
         </div>
 
-        <div class="card-address">
+        <a class="card-address card-address-link" href="${mapsUrl}" target="_blank" rel="noopener noreferrer" title="Get directions on Google Maps" onclick="event.stopPropagation()">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
           </svg>
           ${address}${p.distance ? ` · ${p.distance} km` : ''}
-        </div>
+          <svg class="maps-ext-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
 
         <div class="card-meta">
           <span class="meta-tag">
@@ -126,22 +132,31 @@ export class PropertyCard {
         ` : ''}
 
         <div class="card-footer">
-          <button class="btn btn-primary card-map-btn" style="font-size:0.72rem;padding:6px 12px;flex:1;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            View on Map
-          </button>
-          ${p.url ? `
-            <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size:0.72rem;padding:6px 10px;" title="Open original listing" onclick="event.stopPropagation()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <div class="card-footer-primary">
+            <button class="btn btn-primary card-map-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              View on Map
+            </button>
+            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn card-gmaps-btn" title="Get directions on Google Maps" onclick="event.stopPropagation()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              Directions
             </a>
-          ` : ''}
-          ${p.contactPhone ? `
-            <a href="tel:${p.contactPhone}" class="btn btn-secondary" style="font-size:0.72rem;padding:6px 12px;gap:5px;" title="Call ${p.contactName || 'owner'}" onclick="event.stopPropagation()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l1.97-1.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              ${p.contactName ? `<span style="max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.contactName.split(' ')[0]}</span>` : 'Call'}
-            </a>
-          ` : ''}
-          <span class="source-badge ${sourceBadgeClass}">${sourceLabel}</span>
+          </div>
+          <div class="card-footer-secondary">
+            ${p.url ? `
+              <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="btn-icon-link" title="Open original listing" onclick="event.stopPropagation()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Listing
+              </a>
+            ` : ''}
+            ${p.contactPhone ? `
+              <a href="tel:${p.contactPhone}" class="btn-icon-link" title="Call ${p.contactName || 'owner'}" onclick="event.stopPropagation()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l1.97-1.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                ${p.contactName ? p.contactName.split(' ')[0] : 'Call'}
+              </a>
+            ` : ''}
+            <span class="source-badge ${sourceBadgeClass}">${sourceLabel}</span>
+          </div>
         </div>
 
         ${p.deposit ? `
