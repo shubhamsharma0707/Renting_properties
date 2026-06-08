@@ -1,62 +1,101 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+/**
+ * AI Advice Service — powered by OpenRouter (google/gemma-4-26b-a4b-it:free)
+ * Replaces the previous @google/generative-ai (Gemini) integration.
+ *
+ * OpenRouter endpoint: https://openrouter.ai/api/v1/chat/completions
+ * Model: google/gemma-4-26b-a4b-it:free
+ */
 
-const genAI = process.env.GEMINI_API_KEY
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  : null;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const MODEL = 'google/gemma-4-26b-a4b-it:free';
 
 /**
- * Ask Gemini for smart AI advice about a rental search
- * @param {string} location
- * @param {number} budget
- * @param {object[]} properties - top properties found
- * @param {object} insights - market insights
+ * Call OpenRouter chat completions with the given prompt.
+ * @param {string} prompt - The user message to send.
+ * @returns {Promise<string>} - The assistant's reply text.
  */
-export async function getAIAdvice(location, budget, properties, insights) {
-  if (!genAI) {
-    return {
-      advice: null,
-      tip: null,
-      error: 'Gemini API key not configured'
-    };
+async function callOpenRouter(prompt) {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY is not set in environment variables.');
   }
 
-  try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const response = await fetch(OPENROUTER_BASE_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json',
+      // Optional — lets your app appear on OpenRouter leaderboards
+      'HTTP-Referer': process.env.SITE_URL || 'http://localhost:5173',
+      'X-Title': 'RentRadar',
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 1024,
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+    }),
+  });
 
-    const topProps = properties.slice(0, 5).map(p =>
-      `- ${p.name}: ₹${p.price.toLocaleString('en-IN')}/mo, ${p.bhk} BHK ${p.type}, ${p.area || '?'} sqft`
-    ).join('\n');
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenRouter API error ${response.status}: ${errorText}`);
+  }
 
-    const prompt = `
-You are a helpful Indian rental market expert. A user is searching for rental property with this info:
+  const data = await response.json();
+
+  // Extract the assistant reply
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) {
+    throw new Error('Unexpected OpenRouter response shape: ' + JSON.stringify(data));
+  }
+
+  return text.trim();
+}
+
+/**
+ * Generate AI-powered rental market advice for a given location and budget.
+ *
+ * @param {Object} params
+ * @param {string} params.location   - City / neighbourhood (e.g. "Koramangala, Bangalore")
+ * @param {number} params.budget     - User's monthly budget in INR
+ * @param {Object} params.marketData - { avgRent, minRent, maxRent, inBudgetCount, totalCount }
+ * @returns {Promise<string>} Markdown-formatted AI advice
+ */
+export async function getAIAdvice({ location, budget, marketData }) {
+  const { avgRent, minRent, maxRent, inBudgetCount, totalCount } = marketData || {};
+
+  const prompt = `
+You are RentRadar's AI assistant — a friendly, concise Indian rental market expert.
 
 Location: ${location}
-Monthly Budget: ₹${budget.toLocaleString('en-IN')}
-Average rent in area: ₹${insights?.avgPrice?.toLocaleString('en-IN') || 'unknown'}
-Properties found in budget: ${insights?.inBudgetCount || 0} out of ${insights?.totalCount || 0}
+User budget: ₹${budget?.toLocaleString('en-IN') ?? 'N/A'}/month
+Market data:
+  • Average rent : ₹${avgRent?.toLocaleString('en-IN') ?? 'N/A'}
+  • Min rent     : ₹${minRent?.toLocaleString('en-IN') ?? 'N/A'}
+  • Max rent     : ₹${maxRent?.toLocaleString('en-IN') ?? 'N/A'}
+  • In-budget    : ${inBudgetCount ?? 'N/A'} of ${totalCount ?? 'N/A'} listings
 
-Top listings found:
-${topProps || 'No listings yet'}
+Please provide:
+1. **Budget assessment** — Is the budget realistic for this area?
+2. **Neighbourhood tips** — 2–3 specific locality suggestions near "${location}" that fit the budget.
+3. **Negotiation advice** — One practical tip for negotiating rent in this market.
+4. **Watch-outs** — One thing renters commonly overlook in this area.
 
-Give TWO things in your response, formatted EXACTLY like this:
-ADVICE: [1-2 sentence practical advice about this rental search — is the budget realistic? What should they know about this area?]
-TIP: [One quick actionable tip for a student or renter in this situation]
+Keep the response concise (≈150 words). Use ₹ for currency. Respond in markdown.
+`.trim();
 
-Keep it casual, helpful, and under 60 words total. Use ₹ for rupees.
-`;
-
-    const result = await model.generateContent(prompt);
-    const text   = result.response.text().trim();
-
-    const adviceMatch = text.match(/ADVICE:\s*(.+?)(?=TIP:|$)/s);
-    const tipMatch    = text.match(/TIP:\s*(.+)/s);
-
-    return {
-      advice: adviceMatch?.[1]?.trim() || text,
-      tip:    tipMatch?.[1]?.trim() || null,
-    };
+  try {
+    return await callOpenRouter(prompt);
   } catch (err) {
-    console.warn('Gemini AI error:', err.message);
-    return { advice: null, tip: null, error: err.message };
+    console.error('[gemini.js] OpenRouter call failed:', err.message);
+    // Graceful fallback so the rest of the app still works
+    return `**AI insights temporarily unavailable.**\n\nBased on the market data, the average rent in ${location} is ₹${avgRent?.toLocaleString('en-IN') ?? 'N/A'}/month. ${inBudgetCount ?? 0} of ${totalCount ?? 0} listings fall within your ₹${budget?.toLocaleString('en-IN') ?? ''} budget.`;
   }
 }
+
+export default { getAIAdvice };

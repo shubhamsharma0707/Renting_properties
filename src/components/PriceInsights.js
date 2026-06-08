@@ -82,7 +82,7 @@ export class PriceInsights {
         <svg style="flex-shrink:0;margin-top:2px;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M12 8v4l3 3"/></svg>
         <div id="ai-advice-text" style="font-size:0.78rem;color:var(--text-secondary);line-height:1.55;">
           <span style="color:var(--text-muted);font-style:italic;animation:pulse 1.5s ease infinite;">
-            Gemini is analysing the market...
+            AI is analysing the market...
           </span>
         </div>
       </div>
@@ -101,7 +101,7 @@ export class PriceInsights {
       const data = await resp.json();
 
       if (data.error || (!data.advice && !data.tip)) {
-        adviceEl.innerHTML = `<span style="color:var(--text-muted);font-size:0.72rem;">AI insights unavailable — add GEMINI_API_KEY to .env</span>`;
+        adviceEl.innerHTML = `<span style="color:var(--text-muted);font-size:0.72rem;">AI insights unavailable — add OPENROUTER_API_KEY to .env</span>`;
         return;
       }
 

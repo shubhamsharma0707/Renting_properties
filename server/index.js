@@ -54,7 +54,7 @@ app.get('/health', (_req, res) => res.json({
   apis: {
     googleMaps: !!process.env.GOOGLE_MAPS_API_KEY,
     serpapi:    !!process.env.SERPAPI_KEY,
-    gemini:     !!process.env.GEMINI_API_KEY,
+    openrouter: !!process.env.OPENROUTER_API_KEY,
   }
 }));
 
@@ -72,7 +72,7 @@ app.listen(PORT, () => {
   console.log(`\nRentRadar Backend running at http://localhost:${PORT}`);
   console.log(`  Google Maps API : ${process.env.GOOGLE_MAPS_API_KEY ? '[ok]' : '[not set] using mock data'}`);
   console.log(`  SerpAPI         : ${process.env.SERPAPI_KEY        ? '[ok]' : '[not set] using mock data'}`);
-  console.log(`  Gemini AI       : ${process.env.GEMINI_API_KEY     ? '[ok]' : '[not set] AI insights disabled'}\n`);
+  console.log(`  OpenRouter AI   : ${process.env.OPENROUTER_API_KEY ? '[ok]' : '[not set] AI insights disabled'}\n`);
 });
 
 export default app;

@@ -191,8 +191,8 @@ router.get('/ai-advice', async (req, res) => {
     const mockResult = generateMockListings(safeLocation, budgetNum, 'all', 'all');
     const insights   = getMockInsights(mockResult.properties, budgetNum, safeLocation);
 
-    const aiResult = await getAIAdvice(safeLocation, budgetNum, mockResult.properties, insights);
-    res.json({ success: true, ...aiResult });
+    const aiResult = await getAIAdvice({ location: safeLocation, budget: budgetNum, marketData: insights });
+    res.json({ success: true, advice: aiResult });
   } catch (err) {
     console.error('AI advice error:', err);
     res.status(500).json({ error: 'AI advice unavailable' });
