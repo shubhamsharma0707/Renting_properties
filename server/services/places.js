@@ -45,7 +45,7 @@ export async function getPlacesData(location, budget, type) {
   const allResults = [];
   const seenIds = new Set();
 
-  for (const query of searchQueries.slice(0, 2)) {
+  const queryPromises = searchQueries.slice(0, 2).map(async (query) => {
     try {
       const resp = await axios.get(`${PLACES_BASE}/textsearch/json`, {
         params: {
@@ -93,7 +93,9 @@ export async function getPlacesData(location, budget, type) {
     } catch (err) {
       console.warn(`Places search query failed: ${err.message}`);
     }
-  }
+  });
+
+  await Promise.all(queryPromises);
 
   return { properties: allResults, center };
 }

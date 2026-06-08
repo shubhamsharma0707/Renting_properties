@@ -48,54 +48,56 @@ router.get('/search', async (req, res) => {
     const hasGoogleKey = !!process.env.GOOGLE_MAPS_API_KEY;
     const hasSerpKey   = !!process.env.SERPAPI_KEY;
 
-    // ── Step 0: Geocode the location via Nominatim (free, no key needed) ─────
-    let geocodedCenter = null;
-    try {
-      const geo = await geocodeLocation(safeLocation);
-      geocodedCenter = { lat: geo.lat, lng: geo.lng };
-      center = geocodedCenter;
-      console.log(`  Geocoded: ${geo.displayName} -> ${geo.lat.toFixed(4)}, ${geo.lng.toFixed(4)}`);
-    } catch (err) {
+    // ── Execute external API requests concurrently ────────────────────────────
+    const geocodePromise = geocodeLocation(safeLocation).catch(err => {
       console.warn(`  Geocoding failed: ${err.message}`);
+      return null;
+    });
+
+    const placesPromise = hasGoogleKey ? getPlacesData(safeLocation, budgetNum, safeType).catch(err => {
+      console.warn(`  Google Places error: ${err.message}`);
+      return null;
+    }) : Promise.resolve(null);
+
+    const serpPromise = hasSerpKey ? getWebSearchRentals(safeLocation, budgetNum, safeBhk).catch(err => {
+      console.warn(`  SerpAPI error: ${err.message}`);
+      return null;
+    }) : Promise.resolve(null);
+
+    // Wait for all external APIs to finish
+    const [geoResult, placesResult, serpResults] = await Promise.all([
+      geocodePromise,
+      placesPromise,
+      serpPromise
+    ]);
+
+    // ── Process results synchronously to avoid race conditions ─────────────
+    let geocodedCenter = null;
+    if (geoResult) {
+      geocodedCenter = { lat: geoResult.lat, lng: geoResult.lng };
+      center = geocodedCenter;
+      console.log(`  Geocoded: ${geoResult.displayName} -> ${geoResult.lat.toFixed(4)}, ${geoResult.lng.toFixed(4)}`);
     }
 
-    // ── Real Data: Google Places ──────────────────────────────────────────────
-    if (hasGoogleKey) {
-      try {
-        const placesResult = await getPlacesData(safeLocation, budgetNum, safeType);
-        if (placesResult.properties.length > 0) {
-          properties = placesResult.properties;
-          center = placesResult.center || geocodedCenter;
-          dataSource = 'google';
-          console.log(`  Google Places: ${properties.length} results`);
-        }
-      } catch (err) {
-        console.warn(`  Google Places error: ${err.message}`);
-      }
+    if (placesResult && placesResult.properties.length > 0) {
+      properties = placesResult.properties;
+      center = placesResult.center || geocodedCenter;
+      dataSource = 'google';
+      console.log(`  Google Places: ${properties.length} results`);
     }
 
-    // ── Real Data: SerpAPI Web Search (for price signals) ────────────────────
     let serpPriceSignal = null;
-    if (hasSerpKey) {
-      try {
-        const serpResults = await getWebSearchRentals(safeLocation, budgetNum, safeBhk);
-        if (serpResults.length > 0) {
-          // Extract meaningful price signals — exclude prices at or above the budget ceiling
-          // (SerpAPI often returns budget as a fallback price for results without explicit prices)
-          const validPrices = serpResults
-            .map(p => p.price)
-            .filter(price => price > 2000 && price < budgetNum * 0.95 && price < 200000);
-          if (validPrices.length > 0) {
-            serpPriceSignal = Math.round(validPrices.reduce((a, b) => a + b, 0) / validPrices.length);
-            console.log(`  SerpAPI price signal: avg Rs ${serpPriceSignal.toLocaleString('en-IN')} from ${validPrices.length} results`);
-          } else {
-            console.log(`  SerpAPI: no usable price signals found, using city profile`);
-          }
-          dataSource = 'serp';
-        }
-      } catch (err) {
-        console.warn(`  SerpAPI error: ${err.message}`);
+    if (serpResults && serpResults.length > 0) {
+      const validPrices = serpResults
+        .map(p => p.price)
+        .filter(price => price > 2000 && price < budgetNum * 0.95 && price < 200000);
+      if (validPrices.length > 0) {
+        serpPriceSignal = Math.round(validPrices.reduce((a, b) => a + b, 0) / validPrices.length);
+        console.log(`  SerpAPI price signal: avg Rs ${serpPriceSignal.toLocaleString('en-IN')} from ${validPrices.length} results`);
+      } else {
+        console.log(`  SerpAPI: no usable price signals found, using city profile`);
       }
+      if (dataSource === 'mock') dataSource = 'serp';
     }
 
     // ── Always generate rich mock listings with real geocoded center ──────────
