@@ -3,7 +3,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import searchRouter from './routes/search.js';
 
 config(); // Load .env
@@ -17,6 +17,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:4173',
   'https://shubhamsharma0707.github.io',  // GitHub Pages
+  'https://rentingproperties-production.up.railway.app', // Railway
 ];
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
@@ -58,8 +59,14 @@ app.get('/health', (_req, res) => res.json({
   }
 }));
 
-// ─── 404 catch-all ────────────────────────────────────────────────────────────
-app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
+// ─── Serve Frontend (built by Vite) ───────────────────────────────────────────
+const distPath = join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// SPA fallback — serve index.html for all non-API routes
+app.get('*', (_req, res) => {
+  res.sendFile(join(distPath, 'index.html'));
+});
 
 // ─── Global error handler ─────────────────────────────────────────────────────
 app.use((err, _req, res, _next) => {
