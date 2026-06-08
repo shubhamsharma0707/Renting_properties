@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
-
+ 
 export default defineConfig({
   root: '.',
-  base: '/Renting_properties/',
+  base: '/',
   publicDir: 'public',
   server: {
     port: 5173,
