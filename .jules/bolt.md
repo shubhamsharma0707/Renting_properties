@@ -1,0 +1,3 @@
+## 2024-06-08 - Parallelized External API Requests using Promise.all
+**Learning:** Sequential await calls for independent external APIs (`geocodeLocation`, `getPlacesData`, and `getWebSearchRentals`) created a major performance bottleneck in the `/api/search` route. Similarly, running sequential API calls within loops (e.g. `searchQueries` for Google Places) compounded latency.
+**Action:** Use `Promise.all()` (with individual `.catch()` handlers) to fire off independent requests concurrently. This pattern should be standard practice when orchestrating multiple independent APIs in a single route.
