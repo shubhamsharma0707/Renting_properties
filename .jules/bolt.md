@@ -1,0 +1,1 @@
+## 2026-06-11 - Main Thread Blocking in Reactivity\n**Learning:** Frequent input events like slider dragging triggering heavy DOM re-renders (like Leaflet map markers and property cards) will cause significant UI jank. \n**Action:** Debounce the heavy rendering tasks while maintaining synchronous updates for lightweight UI labels to give the user immediate feedback.
