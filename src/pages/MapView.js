@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { searchProperties, formatINR, getBudgetStatus, showToast } from '../utils/api.js';
+import { searchProperties, formatINR, getBudgetStatus, showToast, debounce } from '../utils/api.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 import { PriceInsights } from '../components/PriceInsights.js';
 
@@ -149,11 +149,19 @@ export class MapView {
 
     const budgetSlider = document.getElementById('budget-filter');
     const budgetLabel  = document.getElementById('budget-filter-label');
+
+    // Create a debounced version of refreshCards to prevent main-thread blocking on slider drag
+    const debouncedRefreshCards = debounce(() => {
+      if (this.map) this.refreshCards();
+    }, 150);
+
     budgetSlider?.addEventListener('input', e => {
       this.params.budget = parseInt(e.target.value);
+      // Synchronous UI updates for smooth feedback
       budgetLabel.textContent = formatINR(this.params.budget);
       this.updateSliderGradient(budgetSlider);
-      this.refreshCards();   // re-render cards + markers with new budget threshold
+      // Debounced heavy DOM/map updates to prevent thrashing
+      debouncedRefreshCards();
     });
     this.updateSliderGradient(budgetSlider);
 
@@ -262,11 +270,10 @@ export class MapView {
   }
 
   getFiltered() {
-    let props = [...this.properties];
     if (this.params.type && this.params.type !== 'all') {
-      props = props.filter(p => p.type === this.params.type);
+      return this.properties.filter(p => p.type === this.params.type);
     }
-    return props;
+    return this.properties;
   }
 
   renderInsights() {
