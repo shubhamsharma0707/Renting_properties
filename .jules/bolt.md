@@ -1,0 +1,3 @@
+## 2024-06-15 - Leaflet Markers & DOM Updates on High-Frequency Events
+**Learning:** Updating large numbers of custom HTML Leaflet markers and re-rendering multiple complex DOM elements (like PropertyCards) synchronously on slider `input` events causes severe main-thread blocking and jank. The sheer volume of DOM manipulation per frame is too high.
+**Action:** Always decouple fast UI updates (like slider label/gradient) from heavy state/DOM operations. Use a `debounce` utility (e.g., ~150ms) for operations that re-render lists or complex map layers when driven by high-frequency events like `input` or `scroll`.
