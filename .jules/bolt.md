@@ -1,0 +1,3 @@
+## 2024-06-18 - [Debounce Slider Input for Map Marker Rendering]
+**Learning:** In the RentRadar project, updating Leaflet map markers and DOM elements synchronously on every `input` tick of a range slider causes significant main thread blocking and lag, specifically during rapid interaction. This occurs because destroying and recreating Leaflet marker nodes is computationally expensive.
+**Action:** Always wrap heavy map rendering functions (like `this.refreshCards()`) inside a `debounce()` (e.g. 300ms) when tying them to frequent events like slider inputs or scroll events, while keeping lightweight UI label updates synchronous.
