@@ -1,0 +1,3 @@
+## 2024-06-27 - [Debounce Leaflet Marker Renders on Slider Input]
+**Learning:** Destroying and recreating Leaflet map markers in this project is computationally expensive and causes main thread blocking. Heavy map rendering functions like `refreshCards` should always be debounced when tied to high-frequency UI events like slider inputs to prevent stuttering.
+**Action:** Always wrap heavy DOM/map manipulations in a `debounce` function (exported from `src/utils/api.js`) when attaching them to high-frequency events like `input` or `scroll`.
