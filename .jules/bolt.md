@@ -1,0 +1,3 @@
+## 2024-07-07 - Leaflet Marker Rendering Bottleneck
+**Learning:** In MapView, destroying and recreating Leaflet markers for all properties during high-frequency events (like slider inputs) is computationally expensive and blocks the main thread. This makes the UI feel unresponsive because slider visual updates are delayed by synchronous map rendering.
+**Action:** When a high-frequency UI element controls heavy map updates, decouple the two. Update the UI state (e.g., label, slider gradient) synchronously, and wrap the heavy map rendering logic (e.g., `refreshCards()`) in a `debounce` function.
