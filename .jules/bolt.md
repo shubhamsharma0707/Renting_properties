@@ -1,0 +1,3 @@
+## 2024-05-14 - Map markers recreation optimization
+**Learning:** Destroying and recreating Leaflet map markers synchronously on high-frequency events (like range slider input) can block the main thread significantly and hurt performance.
+**Action:** When updating map markers or UI elements that depend on heavy rendering functions on high-frequency inputs, wrap the heavy logic in a `debounce` function. In this case, wrapping `refreshCards()` in `src/pages/MapView.js` during the slider update prevented excessive map redraws. Keep the light UI updates (like the slider handle itself and labels) synchronous.
