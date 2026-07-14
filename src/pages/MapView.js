@@ -149,11 +149,18 @@ export class MapView {
 
     const budgetSlider = document.getElementById('budget-filter');
     const budgetLabel  = document.getElementById('budget-filter-label');
+
+    let debounceTimer;
+
     budgetSlider?.addEventListener('input', e => {
       this.params.budget = parseInt(e.target.value);
+      // Synchronous UI updates for responsive feel
       budgetLabel.textContent = formatINR(this.params.budget);
       this.updateSliderGradient(budgetSlider);
-      this.refreshCards();   // re-render cards + markers with new budget threshold
+
+      // Debounced heavy operation (Leaflet markers destroy/recreate)
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => this.refreshCards(), 150);
     });
     this.updateSliderGradient(budgetSlider);
 
