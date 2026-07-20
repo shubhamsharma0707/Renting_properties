@@ -1,0 +1,1 @@
+## 2024-07-20 - [Map Performance Pattern]\n**Learning:** Re-rendering Leaflet markers and map DOM nodes on high-frequency UI events (like 'input' on sliders) causes severe main-thread blocking.\n**Action:** Use the project's 'debounce' utility in 'src/utils/api.js' for expensive DOM/map operations while keeping lightweight UI updates (like text labels) synchronous.
