@@ -1,0 +1,3 @@
+## 2024-05-30 - Leaflet Marker Rendering Bottleneck on Frequent UI Events
+**Learning:** Destroying and recreating Leaflet map markers in this project is computationally expensive and causes main thread blocking when tied to high-frequency events like range slider inputs. Directly triggering the UI card re-renders and map marker regeneration on every `input` event from a slider creates significant jank.
+**Action:** Always debounce heavy map rendering functions (like destroying/creating markers) when they are triggered by high-frequency events (like slider inputs). In this case, wrapping the `refreshCards()` call in a 150ms debounce allowed smooth slider interaction while updating the UI markers just moments later.
