@@ -1,0 +1,3 @@
+## 2024-07-28 - Debounce budget slider on map view
+**Learning:** Destroying and recreating Leaflet map markers and manipulating large numbers of property cards on every input event from a high-frequency slider causes significant main thread blocking and jank.
+**Action:** When filtering map views with a slider or continuous input, wrap the heavy rendering logic (marker updates and card refreshes) in a `debounce` function.
