@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { searchProperties, formatINR, getBudgetStatus, showToast } from '../utils/api.js';
+import { searchProperties, formatINR, getBudgetStatus, showToast, debounce } from '../utils/api.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 import { PriceInsights } from '../components/PriceInsights.js';
 
@@ -140,6 +140,8 @@ export class MapView {
   }
 
   bindEvents() {
+    this.debouncedRefreshCards = debounce(() => this.refreshCards(), 150);
+
     document.getElementById('back-btn')?.addEventListener('click', () => this.navigate('landing'));
 
     document.getElementById('re-search-btn')?.addEventListener('click', () => this.reSearch());
@@ -153,7 +155,7 @@ export class MapView {
       this.params.budget = parseInt(e.target.value);
       budgetLabel.textContent = formatINR(this.params.budget);
       this.updateSliderGradient(budgetSlider);
-      this.refreshCards();   // re-render cards + markers with new budget threshold
+      this.debouncedRefreshCards(); // debounced re-render
     });
     this.updateSliderGradient(budgetSlider);
 
