@@ -1,0 +1,3 @@
+## 2024-10-25 - Debounce map marker updates during slider drag
+**Learning:** Destroying and recreating Leaflet markers and map layers is extremely computationally expensive in this codebase. Triggering `refreshCards` synchronously on every `input` event from the budget slider caused severe main-thread blocking, lagging the UI, because it ran dozens of times per second.
+**Action:** When a slider or fast-firing input event triggers a complete teardown and rebuild of map layers or lists, always separate the fast synchronous updates (e.g. updating the label or slider gradient) from the slow updates (rebuilding the map markers). Apply `debounce` (e.g. 150ms) to the slow, heavy DOM/Leaflet updates to ensure a smooth user experience.
