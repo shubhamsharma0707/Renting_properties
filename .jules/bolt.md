@@ -1,0 +1,3 @@
+## 2023-10-27 - [Debounce High-Frequency Map Rendering Events]
+**Learning:** [Recreating Leaflet map markers on high-frequency UI events like slider input causes severe main thread blocking due to expensive DOM creation (e.g. drop animations and HTML strings). Native input event triggers extremely rapidly, meaning standard function calls here queue many synchronous heavy UI updates.]
+**Action:** [Use `debounce` specifically on the heavy map update (e.g., `this.refreshCards()`) when binding to range sliders, but crucially leave lightweight local UI updates (like reading `e.target.value`, updating numeric text labels, and changing CSS gradients) outside the debounce so the slider feels responsive and snappy to the user.]
