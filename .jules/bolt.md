@@ -1,0 +1,1 @@
+## 2026-10-18 - Debouncing Leaflet map marker rendering\n**Learning:** Destroying and recreating Leaflet map markers continuously during a slider input event severely blocks the main thread.\n**Action:** Always debounce heavy DOM/map manipulations bound to high-frequency events, while keeping lightweight UI updates synchronous to maintain perceived responsiveness.
