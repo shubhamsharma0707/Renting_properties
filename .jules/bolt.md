@@ -1,0 +1,3 @@
+## 2023-10-24 - Leaflet Marker Performance on Slider Input
+**Learning:** Destroying and recreating Leaflet map markers in this project is computationally expensive and can cause main thread blocking. Heavy map rendering functions should be debounced when tied to high-frequency events like slider inputs, while keeping lightweight UI updates (like gradient changes) synchronous.
+**Action:** Always debounce expensive DOM/map rendering functions when bound to slider `input` events, separating the lightweight visual updates (e.g. number formatting or slider gradients) from the heavy calculations to maintain a responsive UI.
