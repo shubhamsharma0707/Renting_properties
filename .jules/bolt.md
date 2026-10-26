@@ -1,0 +1,3 @@
+## 2024-10-26 - Debouncing Heavy DOM Operations on Rapid Input
+**Learning:** In MapView.js, re-rendering DOM elements and Leaflet map markers continuously on a slider `input` event blocked the main thread and caused significant jank. Attempting to update `this.refreshCards()` on every step of the slider dragging operation is a performance anti-pattern.
+**Action:** When binding heavy UI or map updates to high-frequency events (like scrolling or dragging a range input), separate the lightweight, synchronous visual updates (like updating a label or CSS gradient) from the heavy data/DOM updates. Use the existing `debounce` utility to defer the heavy operations until the user pauses their input.
