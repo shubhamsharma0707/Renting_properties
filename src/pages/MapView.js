@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { searchProperties, formatINR, getBudgetStatus, showToast } from '../utils/api.js';
+import { searchProperties, formatINR, getBudgetStatus, showToast, debounce } from '../utils/api.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 import { PriceInsights } from '../components/PriceInsights.js';
 
@@ -18,6 +18,9 @@ export class MapView {
     this.navigate = navigate;
     this.params = params;
     this.properties = [];
+
+    // ⚡ Bolt: Debounce the expensive map marker rendering triggered by slider input
+    this.debouncedRefreshCards = debounce(() => this.refreshCards(), 150);
     this.selectedId = null;
     this.map = null;
     this.markers = [];
@@ -153,7 +156,8 @@ export class MapView {
       this.params.budget = parseInt(e.target.value);
       budgetLabel.textContent = formatINR(this.params.budget);
       this.updateSliderGradient(budgetSlider);
-      this.refreshCards();   // re-render cards + markers with new budget threshold
+      // ⚡ Bolt: Use debounced refresh to avoid main thread blocking during drag
+      this.debouncedRefreshCards();   // re-render cards + markers with new budget threshold
     });
     this.updateSliderGradient(budgetSlider);
 
