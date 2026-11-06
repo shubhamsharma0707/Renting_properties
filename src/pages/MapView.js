@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { searchProperties, formatINR, getBudgetStatus, showToast } from '../utils/api.js';
+import { searchProperties, formatINR, getBudgetStatus, showToast, debounce } from '../utils/api.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 import { PriceInsights } from '../components/PriceInsights.js';
 
@@ -149,11 +149,16 @@ export class MapView {
 
     const budgetSlider = document.getElementById('budget-filter');
     const budgetLabel  = document.getElementById('budget-filter-label');
+
+    // ⚡ Bolt: Debounce the heavy refreshCards function (which destroys/recreates map markers)
+    // to prevent main thread blocking while dragging the slider. UI updates remain synchronous.
+    this.debouncedRefreshCards = this.debouncedRefreshCards || debounce(() => this.refreshCards(), 100);
+
     budgetSlider?.addEventListener('input', e => {
       this.params.budget = parseInt(e.target.value);
       budgetLabel.textContent = formatINR(this.params.budget);
       this.updateSliderGradient(budgetSlider);
-      this.refreshCards();   // re-render cards + markers with new budget threshold
+      this.debouncedRefreshCards();
     });
     this.updateSliderGradient(budgetSlider);
 
